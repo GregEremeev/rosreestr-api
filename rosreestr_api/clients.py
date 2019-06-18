@@ -151,8 +151,8 @@ class RosreestrAPIClient:
         + '&structure={house_structure}&apartment={apartment}')
     SEARCH_DETAILED_OBJECT_BY_ID = f'{BASE_URL}/fir_object/' + '{}/'
 
-    def __init__(self):
-        self._http_client = HTTPClient()
+    def __init__(self, timeout=5, keep_alive=False):
+        self._http_client = HTTPClient(timeout=timeout, keep_alive=keep_alive)
         self._macro_regions = None
         self._macro_regions_to_regions = None
 
