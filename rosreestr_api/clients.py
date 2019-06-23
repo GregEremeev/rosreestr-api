@@ -249,3 +249,27 @@ class RosreestrAPIClient:
         response = self._http_client.get(url)
         logger.info(f'Detailed object was downloaded, object_id: {obj_id}')
         return self._get_response_body(response)
+
+
+class PKK5RosreestrAPIClient:
+
+    BASE_URL = 'https://pkk5.rosreestr.ru/api'
+    SEARCH_OBJECT_BY_COORDINATES_URL = (
+        BASE_URL + '/features/1?text={lat}%20{long}&limit={limit}&'
+        + 'tolerance={tolerance}')
+    SEARCH_OBJECT_BY_CADASTRAL_ID = (
+        BASE_URL + '/features/1?text={cadastral_id}&limit={limit}&'
+        + 'tolerance={tolerance}')
+
+    def __init__(self, timeout=5, keep_alive=False):
+        self._http_client = HTTPClient(timeout=timeout, keep_alive=keep_alive)
+
+    def get_object_by_coordinates(self, *, lat, long, limit=11, tolerance=2):
+        url = self.SEARCH_OBJECT_BY_COORDINATES_URL.format(
+            lat=lat, long=long, limit=limit, tolerance=tolerance)
+        return self._http_client.get(url).json()
+
+    def get_object_by_cadastral_id(self, cadastral_id, limit=11, tolerance=2):
+        url = self.SEARCH_OBJECT_BY_CADASTRAL_ID.format(
+            cadastral_id=cadastral_id, limit=limit, tolerance=tolerance)
+        return self._http_client.get(url).json()
