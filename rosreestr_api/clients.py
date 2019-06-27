@@ -214,8 +214,11 @@ class RosreestrAPIClient:
     def get_objects_by_address(self, address_wrapper: AddressWrapper):
         macro_region_id = address_wrapper.macro_region_id
         if not address_wrapper.macro_region_id:
-            if address_wrapper.macro_region_name.lower() == 'московская':
-                address_wrapper.macro_region_name = 'московская область'
+            macro_region_name = address_wrapper.macro_region_name.lower()
+            if macro_region_name.endswith('ая'):
+                address_wrapper.macro_region_name = macro_region_name + ' область'
+            elif macro_region_name.endswith('ий'):
+                address_wrapper.macro_region_name = macro_region_name + ' край'
             macro_region_id = self._get_macro_region_id(address_wrapper.macro_region_name)
 
         region_id = address_wrapper.region_id
