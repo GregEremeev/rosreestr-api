@@ -216,10 +216,10 @@ class RosreestrAPIClient:
         if not address_wrapper.macro_region_id:
             macro_region_name = address_wrapper.macro_region_name.lower()
             if macro_region_name.endswith('ая'):
-                address_wrapper.macro_region_name = macro_region_name + ' область'
+                macro_region_name = macro_region_name + ' область'
             elif macro_region_name.endswith('ий'):
-                address_wrapper.macro_region_name = macro_region_name + ' край'
-            macro_region_id = self._get_macro_region_id(address_wrapper.macro_region_name)
+                macro_region_name = macro_region_name + ' край'
+            macro_region_id = self._get_macro_region_id(macro_region_name)
 
         region_id = address_wrapper.region_id
         if not region_id:
@@ -257,22 +257,36 @@ class RosreestrAPIClient:
 class PKK5RosreestrAPIClient:
 
     BASE_URL = 'https://pkk5.rosreestr.ru/api'
-    SEARCH_OBJECT_BY_COORDINATES_URL = (
-        BASE_URL + '/features/1?text={lat}%20{long}&limit={limit}&'
-        + 'tolerance={tolerance}')
     SEARCH_OBJECT_BY_CADASTRAL_ID = (
-        BASE_URL + '/features/1?text={cadastral_id}&limit={limit}&'
-        + 'tolerance={tolerance}')
+        BASE_URL + '/features/{object_type}?text={{cadastral_id}}&limit={{limit}}&'
+        + 'tolerance={{tolerance}}')
+    SEARCH_OBJECT_BY_COORDINATES = (
+        BASE_URL + '/features/{object_type}?text={{lat}}%20{{long}}&limit={{limit}}&'
+        + 'tolerance={{tolerance}}')
+    SEARCH_BUILDING_BY_COORDINATES_URL = SEARCH_OBJECT_BY_COORDINATES.format(object_type=5)
+    SEARCH_BUILDING_BY_CADASTRAL_ID_URL = SEARCH_OBJECT_BY_CADASTRAL_ID.format(object_type=5)
+    SEARCH_PARCEL_BY_COORDINATES_URL = SEARCH_OBJECT_BY_COORDINATES.format(object_type=1)
+    SEARCH_PARCEL_BY_CADASTRAL_ID_URL = SEARCH_OBJECT_BY_CADASTRAL_ID.format(object_type=1)
 
     def __init__(self, timeout=5, keep_alive=False):
         self._http_client = HTTPClient(timeout=timeout, keep_alive=keep_alive)
 
-    def get_object_by_coordinates(self, *, lat, long, limit=11, tolerance=2):
-        url = self.SEARCH_OBJECT_BY_COORDINATES_URL.format(
+    def get_parcel_by_coordinates(self, *, lat, long, limit=11, tolerance=2) -> dict:
+        url = self.SEARCH_PARCEL_BY_COORDINATES_URL.format(
             lat=lat, long=long, limit=limit, tolerance=tolerance)
         return self._http_client.get(url).json()
 
-    def get_object_by_cadastral_id(self, cadastral_id, limit=11, tolerance=2):
-        url = self.SEARCH_OBJECT_BY_CADASTRAL_ID.format(
+    def get_parcel_by_cadastral_id(self, cadastral_id, limit=11, tolerance=2) -> dict:
+        url = self.SEARCH_PARCEL_BY_CADASTRAL_ID_URL.format(
             cadastral_id=cadastral_id, limit=limit, tolerance=tolerance)
+        return self._http_client.get(url).json()
+
+    def get_building_by_cadastral_id(self, cadastral_id, limit=11, tolerance=2) -> dict:
+        url = self.SEARCH_BUILDING_BY_CADASTRAL_ID_URL.format(
+            cadastral_id=cadastral_id, limit=limit, tolerance=tolerance)
+        return self._http_client.get(url).json()
+
+    def get_building_by_coordinates(self, *, lat, long, limit=11, tolerance=2) -> dict:
+        url = self.SEARCH_BUILDING_BY_COORDINATES_URL.format(
+            lat=lat, long=long, limit=limit, tolerance=tolerance)
         return self._http_client.get(url).json()

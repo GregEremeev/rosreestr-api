@@ -2,8 +2,8 @@ import pytest
 import httpretty
 
 from rosreestr_api.tests import rosreestr_client_fixtures, pkk5_client_fixtures
-from rosreestr_api.clients import AddressWrapper, RosreestrAPIClient, \
-    PKK5RosreestrAPIClient
+from rosreestr_api.clients import (
+    AddressWrapper, RosreestrAPIClient, PKK5RosreestrAPIClient)
 
 
 def test_fill_address_wrapper_without_macro_region():
@@ -133,42 +133,77 @@ class TestRosreestrAPIClient:
 class TestPKK5RosreestrAPIClient:
 
     BASE_URL = 'https://pkk5.rosreestr.ru/api'
-    SEARCH_OBJECT_BY_COORDINATES_URL = (
-        BASE_URL + '/features/1?text={lat}%20{long}&limit={limit}&'
-        + 'tolerance={tolerance}')
     SEARCH_OBJECT_BY_CADASTRAL_ID = (
-        BASE_URL + '/features/1?text={cadastral_id}&limit={limit}&'
-        + 'tolerance={tolerance}')
+        BASE_URL + '/features/{object_type}?text={{cadastral_id}}&limit={{limit}}&'
+        + 'tolerance={{tolerance}}')
+    SEARCH_OBJECT_BY_COORDINATES = (
+        BASE_URL + '/features/{object_type}?text={{lat}}%20{{long}}&limit={{limit}}&'
+        + 'tolerance={{tolerance}}')
+    SEARCH_BUILDING_BY_COORDINATES_URL = SEARCH_OBJECT_BY_COORDINATES.format(object_type=5)
+    SEARCH_BUILDING_BY_CADASTRAL_ID_URL = SEARCH_OBJECT_BY_CADASTRAL_ID.format(object_type=5)
+    SEARCH_PARCEL_BY_COORDINATES_URL = SEARCH_OBJECT_BY_COORDINATES.format(object_type=1)
+    SEARCH_PARCEL_BY_CADASTRAL_ID_URL = SEARCH_OBJECT_BY_CADASTRAL_ID.format(object_type=1)
 
     CONTENT_TYPE_JSON = 'application/json'
 
     @httpretty.activate
-    def test_get_object_by_coordinates(self):
+    def test_get_parcel_by_coordinates(self):
         search_params = {
             'lat': 55.542, 'long': 37.483,
             'limit': 11, 'tolerance': 2}
-        url = self.SEARCH_OBJECT_BY_COORDINATES_URL.format(**search_params)
+        url = self.SEARCH_PARCEL_BY_COORDINATES_URL.format(**search_params)
         httpretty.register_uri(
             method=httpretty.GET, uri=url,
-            body=pkk5_client_fixtures.OBJECT_BY_COORDINATES_RESPONSE,
+            body=pkk5_client_fixtures.PARCEL_BY_COORDINATES_RESPONSE,
             content_type=self.CONTENT_TYPE_JSON)
 
         api_client = PKK5RosreestrAPIClient()
-        obj = api_client.get_object_by_coordinates(**search_params)
+        obj = api_client.get_parcel_by_coordinates(**search_params)
 
-        assert pkk5_client_fixtures.OBJECT_BY_COORDINATES == obj
+        assert pkk5_client_fixtures.PARCEL_BY_COORDINATES == obj
 
     @httpretty.activate
-    def test_get_object_by_cadastral_id(self):
+    def test_get_parcel_by_cadastral_id(self):
         search_params = {
             'cadastral_id': '77:17:0000000:11471', 'limit': 11, 'tolerance': 2}
-        url = self.SEARCH_OBJECT_BY_CADASTRAL_ID.format(**search_params)
+        url = self.SEARCH_PARCEL_BY_CADASTRAL_ID_URL.format(**search_params)
         httpretty.register_uri(
             method=httpretty.GET, uri=url,
-            body=pkk5_client_fixtures.OBJECT_BY_CADASTRAL_ID_RESPONSE,
+            body=pkk5_client_fixtures.PARCEL_BY_CADASTRAL_ID_RESPONSE,
             content_type=self.CONTENT_TYPE_JSON)
 
         api_client = PKK5RosreestrAPIClient()
-        obj = api_client.get_object_by_cadastral_id(**search_params)
+        obj = api_client.get_parcel_by_cadastral_id(**search_params)
 
-        assert pkk5_client_fixtures.OBJECT_BY_CADASTRAL_ID == obj
+        assert pkk5_client_fixtures.PARCEL_BY_CADASTRAL_ID == obj
+
+    @httpretty.activate
+    def test_get_building_by_coordinates(self):
+        search_params = {
+            'lat': 54.16829, 'long': 37.59876,
+            'limit': 1, 'tolerance': 170}
+        url = self.SEARCH_BUILDING_BY_COORDINATES_URL.format(**search_params)
+        httpretty.register_uri(
+            method=httpretty.GET, uri=url,
+            body=pkk5_client_fixtures.BUILDING_BY_COORDINATES_RESPONSE,
+            content_type=self.CONTENT_TYPE_JSON)
+
+        api_client = PKK5RosreestrAPIClient()
+        obj = api_client.get_building_by_coordinates(**search_params)
+
+        assert pkk5_client_fixtures.BUILDING_BY_COORDINATES == obj
+
+    @httpretty.activate
+    def test_get_building_by_cadastral_id(self):
+        search_params = {
+            'cadastral_id': '71:00:000000:112278', 'limit': 1, 'tolerance': 170}
+        url = self.SEARCH_BUILDING_BY_CADASTRAL_ID_URL.format(**search_params)
+        httpretty.register_uri(
+            method=httpretty.GET, uri=url,
+            body=pkk5_client_fixtures.BUILDING_BY_CADASTRAL_ID_RESPONSE,
+            content_type=self.CONTENT_TYPE_JSON)
+
+        api_client = PKK5RosreestrAPIClient()
+        obj = api_client.get_building_by_cadastral_id(**search_params)
+
+        assert pkk5_client_fixtures.BUILDING_BY_CADASTRAL_ID == obj
