@@ -126,6 +126,7 @@ class AddressWrapper:
     house_building: str = ''
     house_structure: str = ''
     apartment: str = ''
+    macro_region_type: str = ''
 
     region_name: str = ''
     macro_region_name: str = ''
@@ -150,6 +151,8 @@ class RosreestrAPIClient:
         + '&street={street_name}&house={house_number}&building={house_building}'
         + '&structure={house_structure}&apartment={apartment}')
     SEARCH_DETAILED_OBJECT_BY_ID = f'{BASE_URL}/fir_object/' + '{}/'
+
+    REPUBLIC = 'республика'
 
     def __init__(self, timeout=5, keep_alive=False):
         self._http_client = HTTPClient(timeout=timeout, keep_alive=keep_alive)
@@ -219,6 +222,8 @@ class RosreestrAPIClient:
                 macro_region_name = macro_region_name + ' область'
             elif macro_region_name.endswith('ий'):
                 macro_region_name = macro_region_name + ' край'
+            elif address_wrapper.macro_region_type.lower() == self.REPUBLIC:
+                macro_region_name = f'{self.REPUBLIC} {macro_region_name}'
             macro_region_id = self._get_macro_region_id(macro_region_name)
 
         region_id = address_wrapper.region_id
@@ -255,6 +260,11 @@ class RosreestrAPIClient:
 
 
 class PKK5RosreestrAPIClient:
+
+    # about rosreestr's coordinate system
+    # http://holmogori.ru/govinfo/rosreestr/media/2017/4/12/o-primenyaemyih-sistemah-koordinat-dlya-vedeniya-egrn/
+    # about МСК
+    # https://geostart.ru/post/312
 
     BASE_URL = 'https://pkk5.rosreestr.ru/api'
     SEARCH_OBJECT_BY_CADASTRAL_ID = (
