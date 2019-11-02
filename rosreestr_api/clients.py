@@ -1,5 +1,6 @@
 import time
 import logging
+from typing import Union
 from dataclasses import dataclass
 from urllib.parse import urlencode, quote_plus
 
@@ -9,11 +10,26 @@ import requests
 logger = logging.getLogger(__name__)
 
 
-def _get_body_for_logging(body: bytes) -> str:
-    if body:
-        return (b' BODY: ' + body).decode('utf-8')
-    else:
+def _strip_cadastral_id(cadastral_id):
+    stripped_cadastral_id = []
+    cadastral_id = cadastral_id.split(':')
+    for part in cadastral_id:
+        if part:
+            stripped_cadastral_id.append(part[:-1].lstrip('0') + part[-1])
+    return ':'.join(stripped_cadastral_id)
+
+
+def _get_body_for_logging(body: Union[bytes, str]) -> str:
+    try:
+        if isinstance(body, bytes):
+            return (b' BODY: ' + body).decode('utf-8')
+        elif isinstance(body, str):
+            return ' BODY: ' + body
+        else:
+            return ''
+    except UnicodeDecodeError:
         return ''
+
 
 def _get_duration_for_logging(duration: str) -> str:
     if duration is not None:
@@ -252,6 +268,7 @@ class RosreestrAPIClient:
             return []
 
     def get_object(self, obj_id: str):
+        obj_id = _strip_cadastral_id(obj_id)
         url = self.SEARCH_DETAILED_OBJECT_BY_ID.format(obj_id)
         logger.info(f'Trying to download detailed object, object_id: {obj_id}')
         response = self._http_client.get(url)

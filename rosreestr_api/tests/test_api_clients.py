@@ -1,3 +1,5 @@
+from unittest.mock import patch, MagicMock
+
 import pytest
 import httpretty
 
@@ -128,6 +130,18 @@ class TestRosreestrAPIClient:
         obj = api_client.get_object(object_id)
 
         assert rosreestr_client_fixtures.OBJECT_BY_ID == obj
+
+    def test_get_object_strip_cadastral_id(self):
+        expected_arg = (
+            'http://rosreestr.ru/api/online/fir_object/50:4:0:35646/')
+        object_id = '50:04:0000000:35646'
+        mock_http_client_instance = MagicMock(
+            **{'get.return_value': MagicMock(status_code=200)})
+        mock_http_client = MagicMock(return_value=mock_http_client_instance)
+        with patch('rosreestr_api.clients.HTTPClient', mock_http_client):
+            api_client = RosreestrAPIClient()
+        api_client.get_object(object_id)
+        mock_http_client_instance.get.assert_called_once_with(expected_arg)
 
 
 class TestPKK5RosreestrAPIClient:
