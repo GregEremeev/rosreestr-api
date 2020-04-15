@@ -276,14 +276,14 @@ class RosreestrAPIClient:
         return self._get_response_body(response)
 
 
-class PKK5RosreestrAPIClient:
+class PKKRosreestrAPIClient:
 
     # about rosreestr's coordinate system
     # http://holmogori.ru/govinfo/rosreestr/media/2017/4/12/o-primenyaemyih-sistemah-koordinat-dlya-vedeniya-egrn/
     # about МСК
     # https://geostart.ru/post/312
 
-    BASE_URL = 'https://pkk5.rosreestr.ru/api'
+    BASE_URL = 'https://pkk.rosreestr.ru/api'
     SEARCH_OBJECT_BY_CADASTRAL_ID = (
         BASE_URL + '/features/{object_type}?text={{cadastral_id}}&limit={{limit}}&'
         + 'tolerance={{tolerance}}')

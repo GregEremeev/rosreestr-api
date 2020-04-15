@@ -1,6 +1,6 @@
 ## rosreestr-api
 
-#### `rosreestr-api` is an BSD licensed library written in Python. It will be helpful for you if you need to work with rosreestr.ru/api or pkk5.rosreestr.ru/api to obtain info related to realty objects.
+#### `rosreestr-api` is an BSD licensed library written in Python. It will be helpful for you if you need to work with rosreestr.ru/api or pkk.rosreestr.ru/api to obtain info related to realty objects.
 
 ### Quick start
 
@@ -45,13 +45,19 @@ api_client.get_region_types(region_id=region_id)
 
 3 Different ways how to get geo info about realty objects:
 ```python
-from rosreestr_api.clients import PKK5RosreestrAPIClient
+from rosreestr_api.clients import PKKRosreestrAPIClient
 
-api_client = PKK5RosreestrAPIClient()
+api_client = PKKRosreestrAPIClient()
 
-# get objects by cadastral id
-api_client.get_object_by_cadastral_id('77:17:0000000:11471')
+# get building by cadastral id
+api_client.get_building_by_cadastral_id('16:50:110108:2815')
 
-# get objects by coordinates
-api_client.get_object_by_coordinates(lat=55.542, long=37.483)
+# get parcel by cadastral id
+api_client.get_parcel_by_cadastral_id('77:17:0000000:11471')
+
+# get parcel by coordinates
+api_client.get_parcel_by_coordinates(lat=55.542, long=37.483)
+
+# get building by coordinates
+api_client.get_building_by_coordinates(lat=55.828952, long=49.097076)
 ```

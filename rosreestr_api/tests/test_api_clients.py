@@ -3,9 +3,9 @@ from unittest.mock import patch, MagicMock
 import pytest
 import httpretty
 
-from rosreestr_api.tests import rosreestr_client_fixtures, pkk5_client_fixtures
+from rosreestr_api.tests import rosreestr_client_fixtures, pkk_client_fixtures
 from rosreestr_api.clients import (
-    AddressWrapper, RosreestrAPIClient, PKK5RosreestrAPIClient)
+    AddressWrapper, RosreestrAPIClient, PKKRosreestrAPIClient)
 
 
 def test_fill_address_wrapper_without_macro_region():
@@ -144,9 +144,9 @@ class TestRosreestrAPIClient:
         mock_http_client_instance.get.assert_called_once_with(expected_arg)
 
 
-class TestPKK5RosreestrAPIClient:
+class TestPKKRosreestrAPIClient:
 
-    BASE_URL = 'https://pkk5.rosreestr.ru/api'
+    BASE_URL = 'https://pkk.rosreestr.ru/api'
     SEARCH_OBJECT_BY_CADASTRAL_ID = (
         BASE_URL + '/features/{object_type}?text={{cadastral_id}}&limit={{limit}}&'
         + 'tolerance={{tolerance}}')
@@ -168,13 +168,13 @@ class TestPKK5RosreestrAPIClient:
         url = self.SEARCH_PARCEL_BY_COORDINATES_URL.format(**search_params)
         httpretty.register_uri(
             method=httpretty.GET, uri=url,
-            body=pkk5_client_fixtures.PARCEL_BY_COORDINATES_RESPONSE,
+            body=pkk_client_fixtures.PARCEL_BY_COORDINATES_RESPONSE,
             content_type=self.CONTENT_TYPE_JSON)
 
-        api_client = PKK5RosreestrAPIClient()
+        api_client = PKKRosreestrAPIClient()
         obj = api_client.get_parcel_by_coordinates(**search_params)
 
-        assert pkk5_client_fixtures.PARCEL_BY_COORDINATES == obj
+        assert pkk_client_fixtures.PARCEL_BY_COORDINATES == obj
 
     @httpretty.activate
     def test_get_parcel_by_cadastral_id(self):
@@ -183,13 +183,13 @@ class TestPKK5RosreestrAPIClient:
         url = self.SEARCH_PARCEL_BY_CADASTRAL_ID_URL.format(**search_params)
         httpretty.register_uri(
             method=httpretty.GET, uri=url,
-            body=pkk5_client_fixtures.PARCEL_BY_CADASTRAL_ID_RESPONSE,
+            body=pkk_client_fixtures.PARCEL_BY_CADASTRAL_ID_RESPONSE,
             content_type=self.CONTENT_TYPE_JSON)
 
-        api_client = PKK5RosreestrAPIClient()
+        api_client = PKKRosreestrAPIClient()
         obj = api_client.get_parcel_by_cadastral_id(**search_params)
 
-        assert pkk5_client_fixtures.PARCEL_BY_CADASTRAL_ID == obj
+        assert pkk_client_fixtures.PARCEL_BY_CADASTRAL_ID == obj
 
     @httpretty.activate
     def test_get_building_by_coordinates(self):
@@ -199,13 +199,13 @@ class TestPKK5RosreestrAPIClient:
         url = self.SEARCH_BUILDING_BY_COORDINATES_URL.format(**search_params)
         httpretty.register_uri(
             method=httpretty.GET, uri=url,
-            body=pkk5_client_fixtures.BUILDING_BY_COORDINATES_RESPONSE,
+            body=pkk_client_fixtures.BUILDING_BY_COORDINATES_RESPONSE,
             content_type=self.CONTENT_TYPE_JSON)
 
-        api_client = PKK5RosreestrAPIClient()
+        api_client = PKKRosreestrAPIClient()
         obj = api_client.get_building_by_coordinates(**search_params)
 
-        assert pkk5_client_fixtures.BUILDING_BY_COORDINATES == obj
+        assert pkk_client_fixtures.BUILDING_BY_COORDINATES == obj
 
     @httpretty.activate
     def test_get_building_by_cadastral_id(self):
@@ -214,10 +214,10 @@ class TestPKK5RosreestrAPIClient:
         url = self.SEARCH_BUILDING_BY_CADASTRAL_ID_URL.format(**search_params)
         httpretty.register_uri(
             method=httpretty.GET, uri=url,
-            body=pkk5_client_fixtures.BUILDING_BY_CADASTRAL_ID_RESPONSE,
+            body=pkk_client_fixtures.BUILDING_BY_CADASTRAL_ID_RESPONSE,
             content_type=self.CONTENT_TYPE_JSON)
 
-        api_client = PKK5RosreestrAPIClient()
+        api_client = PKKRosreestrAPIClient()
         obj = api_client.get_building_by_cadastral_id(**search_params)
 
-        assert pkk5_client_fixtures.BUILDING_BY_CADASTRAL_ID == obj
+        assert pkk_client_fixtures.BUILDING_BY_CADASTRAL_ID == obj
