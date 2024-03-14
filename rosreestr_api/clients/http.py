@@ -1,12 +1,17 @@
 import logging
+import os.path
 import time
 from typing import Union
 from urllib.parse import urlencode
+from importlib.util import find_spec
 
 import requests
 
+import rosreestr_api
+
 
 logger = logging.getLogger(__name__)
+CACERT_PATH = os.path.join(os.path.dirname(find_spec(rosreestr_api.__name__).origin), 'cacert.pem')
 
 
 class HTTPClient:
@@ -26,6 +31,32 @@ class HTTPClient:
         self.keep_alive = keep_alive
         self.default_headers = default_headers or {}
         self._session = None
+
+    @property
+    def session(self) -> requests.Session:
+        if self.keep_alive:
+            if not self._session:
+                self._session = requests.Session()
+            return self._session
+        else:
+            return requests.Session()
+
+    def get(self, url, params=None, **kwargs) -> requests.Response:
+        if params:
+            url_with_query_params = url + '?' + urlencode(params)
+        else:
+            url_with_query_params = url
+
+        return self._make_request(self.GET_HTTP_METHOD, url_with_query_params, **kwargs)
+
+    def post(self, url, **kwargs) -> requests.Response:
+        return self._make_request(self.POST_HTTP_METHOD, url, **kwargs)
+
+    def patch(self, url, **kwargs) -> requests.Response:
+        return self._make_request(self.PATCH_HTTP_METHOD, url, **kwargs)
+
+    def put(self, url, **kwargs) -> requests.Response:
+        return self._make_request(self.PUT_HTTP_METHOD, url, **kwargs)
 
     def _log_request(self, method, url, body, duration=None, log_method=logger.info):
         message_params = {
@@ -56,7 +87,7 @@ class HTTPClient:
         self._log_request(method, url, prepared_request.body)
         start_time = time.time()
         try:
-            response = session.send(prepared_request, timeout=timeout)
+            response = session.send(prepared_request, timeout=timeout, verify=CACERT_PATH)
             duration = time.time() - start_time
             if response.status_code >= 400:
                 log_method = logging.error
@@ -75,32 +106,6 @@ class HTTPClient:
         finally:
             if not self.keep_alive:
                 session.close()
-
-    @property
-    def session(self) -> requests.Session:
-        if self.keep_alive:
-            if not self._session:
-                self._session = requests.Session()
-            return self._session
-        else:
-            return requests.Session()
-
-    def get(self, url, params=None, **kwargs) -> requests.Response:
-        if params:
-            url_with_query_params = url + '?' + urlencode(params)
-        else:
-            url_with_query_params = url
-
-        return self._make_request(self.GET_HTTP_METHOD, url_with_query_params, **kwargs)
-
-    def post(self, url, **kwargs) -> requests.Response:
-        return self._make_request(self.POST_HTTP_METHOD, url, **kwargs)
-
-    def patch(self, url, **kwargs) -> requests.Response:
-        return self._make_request(self.PATCH_HTTP_METHOD, url, **kwargs)
-
-    def put(self, url, **kwargs) -> requests.Response:
-        return self._make_request(self.PUT_HTTP_METHOD, url, **kwargs)
 
 
 def _get_body_for_logging(body: Union[bytes, str]) -> str:
