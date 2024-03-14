@@ -11,7 +11,7 @@ pip install rosreestr-api
 
 2 Different ways how to get basic info about realty objects:
 ```python
-from rosreestr_api.clients import RosreestrAPIClient, AddressWrapper
+from rosreestr_api.clients.rosreestr import RosreestrAPIClient, AddressWrapper
 
 api_client = RosreestrAPIClient()
 
