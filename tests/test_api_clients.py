@@ -4,8 +4,11 @@ import pytest
 import httpretty
 
 from tests import pkk_client_fixtures, rosreestr_client_fixtures
-from rosreestr_api.clients import (
-    AddressWrapper, RosreestrAPIClient, PKKRosreestrAPIClient)
+from rosreestr_api.clients.rosreestr import (
+    AddressWrapper,
+    RosreestrAPIClient,
+    PKKRosreestrAPIClient,
+)
 
 
 def test_fill_address_wrapper_without_macro_region():
@@ -30,7 +33,7 @@ def test_fill_address_wrapper():
 
 class TestRosreestrAPIClient:
 
-    BASE_URL = 'http://rosreestr.ru/api/online'
+    BASE_URL = 'https://rosreestr.gov.ru/api/online'
     MACRO_REGIONS_URL = f'{BASE_URL}/macro_regions/'
     REGIONS_URL = f'{BASE_URL}/regions/' + '{}/'
     REGION_TYPES_URL = f'{BASE_URL}/region_types/' + '{}/'
@@ -136,15 +139,16 @@ class TestRosreestrAPIClient:
         assert rosreestr_client_fixtures.OBJECT_BY_ID == obj
 
     def test_get_object_strip_cadastral_id(self):
-        expected_arg = (
-            'http://rosreestr.ru/api/online/fir_object/50:4:0:35646/')
+        expected_arg = f'{self.BASE_URL}/fir_object/50:4:0:35646/'
         object_id = '50:04:0000000:35646'
         mock_http_client_instance = MagicMock(
             **{'get.return_value': MagicMock(status_code=200)})
         mock_http_client = MagicMock(return_value=mock_http_client_instance)
-        with patch('rosreestr_api.clients.HTTPClient', mock_http_client):
+
+        with patch('rosreestr_api.clients.rosreestr.HTTPClient', mock_http_client):
             api_client = RosreestrAPIClient()
         api_client.get_object(object_id)
+
         mock_http_client_instance.get.assert_called_once_with(expected_arg)
 
 
