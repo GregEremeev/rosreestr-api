@@ -5,8 +5,7 @@ from urllib.parse import quote_plus
 import requests
 from fake_useragent import UserAgent
 
-from rosreestr_api.clients.http import HTTPClient
-
+from rosreestr_api.clients.http import RosreestrHTTPClient
 
 logger = logging.getLogger(__name__)
 
@@ -50,7 +49,7 @@ class RosreestrAPIClient:
     REPUBLIC = 'республика'
 
     def __init__(self, timeout=5, keep_alive=False):
-        self._http_client = HTTPClient(
+        self._http_client = RosreestrHTTPClient(
             timeout=timeout,
             keep_alive=keep_alive,
             default_headers={'User-Agent': UserAgent().random}
@@ -179,7 +178,7 @@ class PKKRosreestrAPIClient:
     SEARCH_PARCEL_BY_CADASTRAL_ID_URL = SEARCH_OBJECT_BY_CADASTRAL_ID.format(object_type=1)
 
     def __init__(self, timeout=5, keep_alive=False):
-        self._http_client = HTTPClient(
+        self._http_client = RosreestrHTTPClient(
             timeout=timeout,
             keep_alive=keep_alive,
             default_headers={'User-Agent': UserAgent().random}

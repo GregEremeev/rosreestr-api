@@ -145,7 +145,7 @@ class TestRosreestrAPIClient:
             **{'get.return_value': MagicMock(status_code=200)})
         mock_http_client = MagicMock(return_value=mock_http_client_instance)
 
-        with patch('rosreestr_api.clients.rosreestr.HTTPClient', mock_http_client):
+        with patch('rosreestr_api.clients.rosreestr.RosreestrHTTPClient', mock_http_client):
             api_client = RosreestrAPIClient()
         api_client.get_object(object_id)
 

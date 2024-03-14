@@ -14,28 +14,10 @@ import rosreestr_api
 
 
 logger = logging.getLogger(__name__)
-CACERT_PATH = os.path.join(os.path.dirname(find_spec(rosreestr_api.__name__).origin), 'cacert.pem')
 
 
-class HTTPSAdapter(HTTPAdapter):
-    def init_poolmanager(self, *args, **kwargs):
-        ssl_context = ssl.create_default_context()
-        # https://www.openssl.org/docs/man3.0/man3/SSL_CTX_set_security_level.html
-        # rosreestr supports only SECLEVEL 1
-        ssl_context.set_ciphers('DEFAULT@SECLEVEL=1')
-        # We want to use the most secured protocol from security level 1
-        ssl_context.minimum_version = ssl.TLSVersion.TLSv1_2
-        kwargs['ssl_context'] = ssl_context
-        return super().init_poolmanager(*args, **kwargs)
-
-
-class CustomSession(Session):
-    def __init__(self):
-        super().__init__()
-        self.mount(prefix='https://', adapter=HTTPSAdapter())
-
-
-class HTTPClient:
+class BaseHTTPClient:
+    SESSION_CLS = Session
 
     GET_HTTP_METHOD = 'GET'
     POST_HTTP_METHOD = 'POST'
@@ -57,10 +39,10 @@ class HTTPClient:
     def session(self) -> requests.Session:
         if self.keep_alive:
             if not self._session:
-                self._session = CustomSession()
+                self._session = self.SESSION_CLS()
             return self._session
         else:
-            return CustomSession()
+            return self.SESSION_CLS()
 
     def get(self, url, params=None, **kwargs) -> requests.Response:
         if params:
@@ -108,7 +90,7 @@ class HTTPClient:
         self._log_request(method, url, prepared_request.body)
         start_time = time.time()
         try:
-            response = session.send(prepared_request, timeout=timeout, verify=CACERT_PATH)
+            response = session.send(prepared_request, timeout=timeout)
             duration = time.time() - start_time
             if response.status_code >= 400:
                 log_method = logging.error
@@ -127,6 +109,33 @@ class HTTPClient:
         finally:
             if not self.keep_alive:
                 session.close()
+
+
+class HTTPSAdapter(HTTPAdapter):
+    def init_poolmanager(self, *args, **kwargs):
+        ssl_context = ssl.create_default_context()
+        # https://www.openssl.org/docs/man3.0/man3/SSL_CTX_set_security_level.html
+        # rosreestr supports only SECLEVEL 1
+        ssl_context.set_ciphers('DEFAULT@SECLEVEL=1')
+        # We want to use the most secured protocol from security level 1
+        ssl_context.minimum_version = ssl.TLSVersion.TLSv1_2
+        kwargs['ssl_context'] = ssl_context
+        return super().init_poolmanager(*args, **kwargs)
+
+
+class CustomSession(Session):
+    CACERT_PATH = os.path.join(
+        os.path.dirname(find_spec(rosreestr_api.__name__).origin),
+        'cacert.pem'
+    )
+    def __init__(self):
+        super().__init__()
+        self.verify = self.CACERT_PATH
+        self.mount(prefix='https://', adapter=HTTPSAdapter())
+
+
+class RosreestrHTTPClient(BaseHTTPClient):
+    SESSION_CLS = CustomSession
 
 
 def _get_body_for_logging(body: Union[bytes, str]) -> str:
