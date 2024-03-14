@@ -3,6 +3,7 @@ from dataclasses import dataclass
 from urllib.parse import quote_plus
 
 import requests
+from fake_useragent import UserAgent
 
 from rosreestr_api.clients.http import HTTPClient
 
@@ -49,7 +50,11 @@ class RosreestrAPIClient:
     REPUBLIC = 'республика'
 
     def __init__(self, timeout=5, keep_alive=False):
-        self._http_client = HTTPClient(timeout=timeout, keep_alive=keep_alive)
+        self._http_client = HTTPClient(
+            timeout=timeout,
+            keep_alive=keep_alive,
+            default_headers={'User-Agent': UserAgent().random}
+        )
         self._macro_regions = None
         self._macro_regions_to_regions = None
 
@@ -174,7 +179,11 @@ class PKKRosreestrAPIClient:
     SEARCH_PARCEL_BY_CADASTRAL_ID_URL = SEARCH_OBJECT_BY_CADASTRAL_ID.format(object_type=1)
 
     def __init__(self, timeout=5, keep_alive=False):
-        self._http_client = HTTPClient(timeout=timeout, keep_alive=keep_alive)
+        self._http_client = HTTPClient(
+            timeout=timeout,
+            keep_alive=keep_alive,
+            default_headers={'User-Agent': UserAgent().random}
+        )
 
     def get_parcel_by_coordinates(self, *, lat, long, limit=11, tolerance=2) -> dict:
         url = self.SEARCH_PARCEL_BY_COORDINATES_URL.format(
