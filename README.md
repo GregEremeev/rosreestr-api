@@ -11,7 +11,7 @@ pip install rosreestr-api
 
 2 Different ways how to get basic info about realty objects:
 ```python
-from rosreestr_api.clients import RosreestrAPIClient, AddressWrapper
+from rosreestr_api.clients.rosreestr import RosreestrAPIClient, AddressWrapper
 
 api_client = RosreestrAPIClient()
 
@@ -45,7 +45,7 @@ api_client.get_region_types(region_id=region_id)
 
 3 Different ways how to get geo info about realty objects:
 ```python
-from rosreestr_api.clients import PKKRosreestrAPIClient
+from rosreestr_api.clients.rosreestr import PKKRosreestrAPIClient
 
 api_client = PKKRosreestrAPIClient()
 
