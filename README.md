@@ -26,9 +26,9 @@ api_client.get_object('77:05:0007007:4926')
 
 3 Different ways how to get geo info about realty objects:
 ```python
-from rosreestr_api.clients.rosreestr import PKKRosreestrAPIClient
+from rosreestr_api.clients.rosreestr import NSPDAPIClient
 
-api_client = PKKRosreestrAPIClient()
+api_client = NSPDAPIClient()
 
 # get building by cadastral id
 api_client.get_building_by_cadastral_id('16:50:110108:2815')

@@ -2,10 +2,10 @@ import pytest
 import httpretty
 import requests
 
-from tests import pkk_client_fixtures, rosreestr_client_fixtures
+from tests import nspd_client_fixtures, rosreestr_client_fixtures
 from rosreestr_api.clients.rosreestr import (
     RosreestrAPIClient,
-    PKKRosreestrAPIClient,
+    NSPDAPIClient,
 )
 
 
@@ -70,7 +70,7 @@ class TestRosreestrAPIClient:
             api_client.get_object('77:17:0000000:11471')
 
 
-class TestPKKRosreestrAPIClient:
+class TestNSPDAPIClient:
 
     NSPD_SEARCH_URL = 'https://nspd.gov.ru/api/geoportal/v2/search/geoportal'
     NSPD_PARCELS_WMS_URL = 'https://nspd.gov.ru/api/aeggis/v3/36048/wms'
@@ -83,13 +83,13 @@ class TestPKKRosreestrAPIClient:
     def test_get_parcel_by_coordinates(self):
         httpretty.register_uri(
             method=httpretty.GET, uri=self.NSPD_PARCELS_WMS_URL,
-            body=pkk_client_fixtures.PARCEL_BY_COORDINATES_RESPONSE,
+            body=nspd_client_fixtures.PARCEL_BY_COORDINATES_RESPONSE,
             content_type=self.CONTENT_TYPE_JSON)
 
-        api_client = PKKRosreestrAPIClient()
+        api_client = NSPDAPIClient()
         obj = api_client.get_parcel_by_coordinates(lat=55.761, long=37.6096, limit=5)
 
-        assert pkk_client_fixtures.PARCEL_BY_COORDINATES == obj
+        assert nspd_client_fixtures.PARCEL_BY_COORDINATES == obj
         request = httpretty.last_request()
         query = {key: value[0] for key, value in request.querystring.items()}
         assert 'GetFeatureInfo' == query['REQUEST']
@@ -108,13 +108,13 @@ class TestPKKRosreestrAPIClient:
         cadastral_id = '72:17:1502001:499'
         httpretty.register_uri(
             method=httpretty.GET, uri=self.NSPD_SEARCH_URL,
-            body=pkk_client_fixtures.PARCEL_BY_CADASTRAL_ID_RESPONSE,
+            body=nspd_client_fixtures.PARCEL_BY_CADASTRAL_ID_RESPONSE,
             content_type=self.CONTENT_TYPE_JSON)
 
-        api_client = PKKRosreestrAPIClient()
+        api_client = NSPDAPIClient()
         obj = api_client.get_parcel_by_cadastral_id(cadastral_id)
 
-        assert pkk_client_fixtures.PARCEL_BY_CADASTRAL_ID == obj
+        assert nspd_client_fixtures.PARCEL_BY_CADASTRAL_ID == obj
         request = httpretty.last_request()
         assert {'thematicSearchId': ['1'], 'query': [cadastral_id]} == request.querystring
         assert self.NSPD_REFERER == request.headers['Referer']
@@ -123,13 +123,13 @@ class TestPKKRosreestrAPIClient:
     def test_get_building_by_coordinates(self):
         httpretty.register_uri(
             method=httpretty.GET, uri=self.NSPD_BUILDINGS_WMS_URL,
-            body=pkk_client_fixtures.BUILDING_BY_COORDINATES_RESPONSE,
+            body=nspd_client_fixtures.BUILDING_BY_COORDINATES_RESPONSE,
             content_type=self.CONTENT_TYPE_JSON)
 
-        api_client = PKKRosreestrAPIClient()
+        api_client = NSPDAPIClient()
         obj = api_client.get_building_by_coordinates(lat=55.828952, long=49.097076, limit=1)
 
-        assert pkk_client_fixtures.BUILDING_BY_COORDINATES == obj
+        assert nspd_client_fixtures.BUILDING_BY_COORDINATES == obj
         request = httpretty.last_request()
         query = {key: value[0] for key, value in request.querystring.items()}
         assert 'GetFeatureInfo' == query['REQUEST']
@@ -146,13 +146,13 @@ class TestPKKRosreestrAPIClient:
         cadastral_id = '77:01:0001005:2106'
         httpretty.register_uri(
             method=httpretty.GET, uri=self.NSPD_SEARCH_URL,
-            body=pkk_client_fixtures.BUILDING_BY_CADASTRAL_ID_RESPONSE,
+            body=nspd_client_fixtures.BUILDING_BY_CADASTRAL_ID_RESPONSE,
             content_type=self.CONTENT_TYPE_JSON)
 
-        api_client = PKKRosreestrAPIClient()
+        api_client = NSPDAPIClient()
         obj = api_client.get_building_by_cadastral_id(cadastral_id)
 
-        assert pkk_client_fixtures.BUILDING_BY_CADASTRAL_ID == obj
+        assert nspd_client_fixtures.BUILDING_BY_CADASTRAL_ID == obj
         request = httpretty.last_request()
         assert {'thematicSearchId': ['1'], 'query': [cadastral_id]} == request.querystring
         assert self.NSPD_REFERER == request.headers['Referer']

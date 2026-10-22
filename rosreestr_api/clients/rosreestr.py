@@ -52,18 +52,18 @@ class RosreestrAPIClient:
         # rosreestr.gov.ru/api/online was shut down; nspd.gov.ru has the same
         # details for parcels, buildings and premises, by the full cadastral id only
         params = {
-            'thematicSearchId': PKKRosreestrAPIClient.NSPD_REAL_ESTATE_THEMATIC_SEARCH_ID,
+            'thematicSearchId': NSPDAPIClient.NSPD_REAL_ESTATE_THEMATIC_SEARCH_ID,
             'query': cadastral_id,
         }
-        headers = {'Referer': PKKRosreestrAPIClient.NSPD_REFERER}
+        headers = {'Referer': NSPDAPIClient.NSPD_REFERER}
         logger.info(f'Trying to download detailed object, cadastral_id: {cadastral_id}')
         response = self._http_client.get(
-            PKKRosreestrAPIClient.NSPD_SEARCH_URL, params=params, headers=headers)
+            NSPDAPIClient.NSPD_SEARCH_URL, params=params, headers=headers)
         logger.info(f'Detailed object was downloaded, cadastral_id: {cadastral_id}')
         return self._get_response_body(response)
 
 
-class PKKRosreestrAPIClient:
+class NSPDAPIClient:
 
     # about rosreestr's coordinate system
     # http://holmogori.ru/govinfo/rosreestr/media/2017/4/12/o-primenyaemyih-sistemah-koordinat-dlya-vedeniya-egrn/
