@@ -148,30 +148,78 @@ PARCEL_BY_CADASTRAL_ID_RESPONSE = json.dumps(PARCEL_BY_CADASTRAL_ID).encode('utf
 
 
 BUILDING_BY_COORDINATES = {
-  'features': [
-    {
-      'attrs': {
-        'address': 'Российская Федерация, Тульская область, г.Тула, ул. 1-ая Хомутовка',
-        'cn': '71:00:000000:112278',
-        'id': '71:0:0:112278'
-      },
-      'center': {
-        'x': 4187644.2574798283,
-        'y': 7202894.7063751975
-      },
-      'extent': {
-        'xmax': 4190910.7296789056,
-        'xmin': 4184226.322656533,
-        'ymax': 7205638.943976473,
-        'ymin': 7199935.937776311
-      },
-      'sort': 71000000000112278,
-      'type': 5
-    }
-  ],
-  'note': '',
-  'status': 200,
-  'total': None
+    'type': 'FeatureCollection',
+    'features': [
+        {
+            'id': 34982758,
+            'type': 'Feature',
+            'geometry': {
+                'type': 'Polygon',
+                'coordinates': [
+                    [
+                        [5465425.373577463, 7524467.898493769],
+                        [5465425.409797057, 7524449.136005895],
+                        [5465430.667759769, 7524449.131199871],
+                        [5465430.458780463, 7524434.214025703],
+                        [5465425.373577463, 7524467.898493769]
+                    ]
+                ],
+                'crs': {
+                    'type': 'name',
+                    'properties': {
+                        'name': 'EPSG:3857'
+                    }
+                }
+            },
+            'properties': {
+                'cadastralDistrictsCode': 16,
+                'category': 36369,
+                'categoryName': 'Здания',
+                'descr': '16:50:110108:2815',
+                'externalKey': '16:50:110108:2815',
+                'interactionId': 34953462,
+                'label': '16:50:110108:2815',
+                'options': {
+                    'build_record_area': 961.6,
+                    'build_record_registration_date': '2014-01-20',
+                    'build_record_type_value': 'Здание',
+                    'building_name': 'Здание Республиканской юношеской библиотеки',
+                    'cad_num': '16:50:110108:2815',
+                    'cost_application_date': '2024-01-01',
+                    'cost_approvement_date': '',
+                    'cost_determination_date': '2023-01-01',
+                    'cost_index': 24782.06,
+                    'cost_registration_date': '2023-12-19',
+                    'cost_value': 23830433.51,
+                    'cultural_heritage_val': '',
+                    'determination_couse': 'Акт об утверждении результатов определения кадастровой стоимости, полученных в соответствии с положениями Закона 237-ФЗ',
+                    'facility_cad_number': '',
+                    'floors': '2',
+                    'intersected_cad_numbers': None,
+                    'materials': 'Кирпичные',
+                    'ownership_type': 'Государственная субъекта РФ',
+                    'permitted_use_name': None,
+                    'previously_posted': 'Учтенный',
+                    'purpose': 'Нежилое',
+                    'quarter_cad_number': '16:50:110108',
+                    'readable_address': 'Российская Федерация, Республика Татарстан (Татарстан), г.о. город Казань, г Казань, пр-кт Ибрагимова, д. 53б',
+                    'right_type': 'Оперативное управление;Собственность',
+                    'status': 'Учтенный',
+                    'underground_floors': '',
+                    'united_cad_numbers': '',
+                    'year_built': '1979',
+                    'year_commisioning': ''
+                },
+                'subcategory': 1,
+                'systemInfo': {
+                    'inserted': '2023-02-13T07:39:22.434796',
+                    'insertedBy': '00000000-0000-0000-0000-000000000001',
+                    'updated': '2026-10-16T22:32:44.623383',
+                    'updatedBy': '7EF5CD0B-AC08-4097-AF2B-07CD85992A79'
+                }
+            }
+        }
+    ]
 }
 BUILDING_BY_COORDINATES_RESPONSE = json.dumps(BUILDING_BY_COORDINATES).encode('utf-8')
 
