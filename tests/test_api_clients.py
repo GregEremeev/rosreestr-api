@@ -164,7 +164,9 @@ class TestPKKRosreestrAPIClient:
     SEARCH_BUILDING_BY_COORDINATES_URL = SEARCH_OBJECT_BY_COORDINATES.format(object_type=5)
     SEARCH_BUILDING_BY_CADASTRAL_ID_URL = SEARCH_OBJECT_BY_CADASTRAL_ID.format(object_type=5)
     SEARCH_PARCEL_BY_COORDINATES_URL = SEARCH_OBJECT_BY_COORDINATES.format(object_type=1)
-    SEARCH_PARCEL_BY_CADASTRAL_ID_URL = SEARCH_OBJECT_BY_CADASTRAL_ID.format(object_type=1)
+
+    NSPD_SEARCH_URL = 'https://nspd.gov.ru/api/geoportal/v2/search/geoportal'
+    NSPD_REFERER = 'https://nspd.gov.ru/map?thematic=PKK'
 
     CONTENT_TYPE_JSON = 'application/json'
 
@@ -186,18 +188,19 @@ class TestPKKRosreestrAPIClient:
 
     @httpretty.activate
     def test_get_parcel_by_cadastral_id(self):
-        search_params = {
-            'cadastral_id': '77:17:0000000:11471', 'limit': 11, 'tolerance': 2}
-        url = self.SEARCH_PARCEL_BY_CADASTRAL_ID_URL.format(**search_params)
+        cadastral_id = '72:17:1502001:499'
         httpretty.register_uri(
-            method=httpretty.GET, uri=url,
+            method=httpretty.GET, uri=self.NSPD_SEARCH_URL,
             body=pkk_client_fixtures.PARCEL_BY_CADASTRAL_ID_RESPONSE,
             content_type=self.CONTENT_TYPE_JSON)
 
         api_client = PKKRosreestrAPIClient()
-        obj = api_client.get_parcel_by_cadastral_id(**search_params)
+        obj = api_client.get_parcel_by_cadastral_id(cadastral_id)
 
         assert pkk_client_fixtures.PARCEL_BY_CADASTRAL_ID == obj
+        request = httpretty.last_request()
+        assert {'thematicSearchId': ['1'], 'query': [cadastral_id]} == request.querystring
+        assert self.NSPD_REFERER == request.headers['Referer']
 
     @httpretty.activate
     def test_get_building_by_coordinates(self):
