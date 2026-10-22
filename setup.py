@@ -12,7 +12,7 @@ setup(
     license='BSD-3-Clause',
     url='https://github.com/GregEremeev/rosreestr-api',
     install_requires=requirements,
-    description='Toolset to work with rosreestr.gov.ru/api and pkk.rosreestr.ru/api',
+    description='Toolset to work with rosreestr.gov.ru/api and nspd.gov.ru/api',
     packages=find_packages(),
     extras_require={'dev': ['ipdb>=0.13.2', 'pytest>=5.4.1', 'httpretty>=1.0.2']},
     classifiers=[

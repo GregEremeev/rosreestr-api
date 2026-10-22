@@ -169,12 +169,6 @@ class PKKRosreestrAPIClient:
     # about МСК
     # https://geostart.ru/post/312
 
-    BASE_URL = 'https://pkk.rosreestr.ru/api'
-    SEARCH_OBJECT_BY_COORDINATES = (
-        BASE_URL + '/features/{object_type}?text={{lat}}%20{{long}}&limit={{limit}}&'
-        + 'tolerance={{tolerance}}')
-    SEARCH_BUILDING_BY_COORDINATES_URL = SEARCH_OBJECT_BY_COORDINATES.format(object_type=5)
-
     # pkk.rosreestr.ru was replaced by nspd.gov.ru on 23.12.2024
     NSPD_BASE_URL = 'https://nspd.gov.ru/api'
     # nspd's WAF rejects API requests without a Referer pointing to the map page
@@ -185,7 +179,9 @@ class PKKRosreestrAPIClient:
     SEARCH_BUILDING_BY_CADASTRAL_ID_URL = NSPD_SEARCH_URL
     NSPD_WMS_URL = NSPD_BASE_URL + '/aeggis/v3/{layer_id}/wms'
     NSPD_PARCELS_LAYER_ID = 36048
+    NSPD_BUILDINGS_LAYER_ID = 36049
     SEARCH_PARCEL_BY_COORDINATES_URL = NSPD_WMS_URL.format(layer_id=NSPD_PARCELS_LAYER_ID)
+    SEARCH_BUILDING_BY_COORDINATES_URL = NSPD_WMS_URL.format(layer_id=NSPD_BUILDINGS_LAYER_ID)
     # GetFeatureInfo asks what lies under the centre pixel of a small map
     # image around the point; nspd works in EPSG:3857 only
     NSPD_FEATURE_INFO_IMAGE_SIZE = 512
@@ -209,10 +205,10 @@ class PKKRosreestrAPIClient:
     def get_building_by_cadastral_id(self, cadastral_id) -> dict:
         return self._search_by_cadastral_id(self.SEARCH_BUILDING_BY_CADASTRAL_ID_URL, cadastral_id)
 
-    def get_building_by_coordinates(self, *, lat, long, limit=11, tolerance=2) -> dict:
-        url = self.SEARCH_BUILDING_BY_COORDINATES_URL.format(
-            lat=lat, long=long, limit=limit, tolerance=tolerance)
-        return self._http_client.get(url).json()
+    def get_building_by_coordinates(self, *, lat, long, limit=11) -> dict:
+        return self._get_feature_info(
+            self.SEARCH_BUILDING_BY_COORDINATES_URL, self.NSPD_BUILDINGS_LAYER_ID,
+            lat=lat, long=long, limit=limit)
 
     def _search_by_cadastral_id(self, url, cadastral_id) -> dict:
         params = {

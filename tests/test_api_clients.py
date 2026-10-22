@@ -154,14 +154,9 @@ class TestRosreestrAPIClient:
 
 class TestPKKRosreestrAPIClient:
 
-    BASE_URL = 'https://pkk.rosreestr.ru/api'
-    SEARCH_OBJECT_BY_COORDINATES = (
-        BASE_URL + '/features/{object_type}?text={{lat}}%20{{long}}&limit={{limit}}&'
-        + 'tolerance={{tolerance}}')
-    SEARCH_BUILDING_BY_COORDINATES_URL = SEARCH_OBJECT_BY_COORDINATES.format(object_type=5)
-
     NSPD_SEARCH_URL = 'https://nspd.gov.ru/api/geoportal/v2/search/geoportal'
     NSPD_PARCELS_WMS_URL = 'https://nspd.gov.ru/api/aeggis/v3/36048/wms'
+    NSPD_BUILDINGS_WMS_URL = 'https://nspd.gov.ru/api/aeggis/v3/36049/wms'
     NSPD_REFERER = 'https://nspd.gov.ru/map?thematic=PKK'
 
     CONTENT_TYPE_JSON = 'application/json'
@@ -208,19 +203,25 @@ class TestPKKRosreestrAPIClient:
 
     @httpretty.activate
     def test_get_building_by_coordinates(self):
-        search_params = {
-            'lat': 54.16829, 'long': 37.59876,
-            'limit': 1, 'tolerance': 170}
-        url = self.SEARCH_BUILDING_BY_COORDINATES_URL.format(**search_params)
         httpretty.register_uri(
-            method=httpretty.GET, uri=url,
+            method=httpretty.GET, uri=self.NSPD_BUILDINGS_WMS_URL,
             body=pkk_client_fixtures.BUILDING_BY_COORDINATES_RESPONSE,
             content_type=self.CONTENT_TYPE_JSON)
 
         api_client = PKKRosreestrAPIClient()
-        obj = api_client.get_building_by_coordinates(**search_params)
+        obj = api_client.get_building_by_coordinates(lat=55.828952, long=49.097076, limit=1)
 
         assert pkk_client_fixtures.BUILDING_BY_COORDINATES == obj
+        request = httpretty.last_request()
+        query = {key: value[0] for key, value in request.querystring.items()}
+        assert 'GetFeatureInfo' == query['REQUEST']
+        assert '36049' == query['LAYERS'] == query['QUERY_LAYERS']
+        assert '1' == query['FEATURE_COUNT']
+        min_x, min_y, max_x, max_y = map(float, query['BBOX'].split(','))
+        # the point in EPSG:3857
+        assert (min_x + max_x) / 2 == pytest.approx(5465461.50, abs=0.01)
+        assert (min_y + max_y) / 2 == pytest.approx(7524439.92, abs=0.01)
+        assert self.NSPD_REFERER == request.headers['Referer']
 
     @httpretty.activate
     def test_get_building_by_cadastral_id(self):

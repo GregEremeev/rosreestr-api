@@ -1,6 +1,6 @@
 ## rosreestr-api
 
-#### `rosreestr-api` is an BSD licensed library written in Python. It will be helpful for you if you need to work with rosreestr.ru/api or pkk.rosreestr.ru/api to obtain info related to realty objects.
+#### `rosreestr-api` is an BSD licensed library written in Python. It will be helpful for you if you need to work with rosreestr.ru/api or nspd.gov.ru/api (formerly pkk.rosreestr.ru) to obtain info related to realty objects.
 
 ### Quick start
 
