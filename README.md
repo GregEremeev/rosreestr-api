@@ -53,7 +53,7 @@ api_client = PKKRosreestrAPIClient()
 api_client.get_building_by_cadastral_id('16:50:110108:2815')
 
 # get parcel by cadastral id
-api_client.get_parcel_by_cadastral_id('77:17:0000000:11471')
+api_client.get_parcel_by_cadastral_id('72:17:1502001:499')
 
 # get parcel by coordinates
 api_client.get_parcel_by_coordinates(lat=55.542, long=37.483)
