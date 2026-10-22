@@ -166,14 +166,10 @@ class PKKRosreestrAPIClient:
     # https://geostart.ru/post/312
 
     BASE_URL = 'https://pkk.rosreestr.ru/api'
-    SEARCH_OBJECT_BY_CADASTRAL_ID = (
-        BASE_URL + '/features/{object_type}?text={{cadastral_id}}&limit={{limit}}&'
-        + 'tolerance={{tolerance}}')
     SEARCH_OBJECT_BY_COORDINATES = (
         BASE_URL + '/features/{object_type}?text={{lat}}%20{{long}}&limit={{limit}}&'
         + 'tolerance={{tolerance}}')
     SEARCH_BUILDING_BY_COORDINATES_URL = SEARCH_OBJECT_BY_COORDINATES.format(object_type=5)
-    SEARCH_BUILDING_BY_CADASTRAL_ID_URL = SEARCH_OBJECT_BY_CADASTRAL_ID.format(object_type=5)
     SEARCH_PARCEL_BY_COORDINATES_URL = SEARCH_OBJECT_BY_COORDINATES.format(object_type=1)
 
     # pkk.rosreestr.ru was replaced by nspd.gov.ru on 23.12.2024
@@ -183,6 +179,7 @@ class PKKRosreestrAPIClient:
     NSPD_SEARCH_URL = NSPD_BASE_URL + '/geoportal/v2/search/geoportal'
     NSPD_REAL_ESTATE_THEMATIC_SEARCH_ID = 1
     SEARCH_PARCEL_BY_CADASTRAL_ID_URL = NSPD_SEARCH_URL
+    SEARCH_BUILDING_BY_CADASTRAL_ID_URL = NSPD_SEARCH_URL
 
     def __init__(self, timeout=5, keep_alive=False):
         self._http_client = RosreestrHTTPClient(
@@ -197,16 +194,17 @@ class PKKRosreestrAPIClient:
         return self._http_client.get(url).json()
 
     def get_parcel_by_cadastral_id(self, cadastral_id) -> dict:
+        return self._search_by_cadastral_id(self.SEARCH_PARCEL_BY_CADASTRAL_ID_URL, cadastral_id)
+
+    def get_building_by_cadastral_id(self, cadastral_id) -> dict:
+        return self._search_by_cadastral_id(self.SEARCH_BUILDING_BY_CADASTRAL_ID_URL, cadastral_id)
+
+    def _search_by_cadastral_id(self, url, cadastral_id) -> dict:
         params = {
             'thematicSearchId': self.NSPD_REAL_ESTATE_THEMATIC_SEARCH_ID,
             'query': cadastral_id,
         }
-        return self._http_client.get(self.SEARCH_PARCEL_BY_CADASTRAL_ID_URL, params=params).json()
-
-    def get_building_by_cadastral_id(self, cadastral_id, limit=11, tolerance=2) -> dict:
-        url = self.SEARCH_BUILDING_BY_CADASTRAL_ID_URL.format(
-            cadastral_id=cadastral_id, limit=limit, tolerance=tolerance)
-        return self._http_client.get(url).json()
+        return self._http_client.get(url, params=params).json()
 
     def get_building_by_coordinates(self, *, lat, long, limit=11, tolerance=2) -> dict:
         url = self.SEARCH_BUILDING_BY_COORDINATES_URL.format(

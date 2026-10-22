@@ -155,14 +155,10 @@ class TestRosreestrAPIClient:
 class TestPKKRosreestrAPIClient:
 
     BASE_URL = 'https://pkk.rosreestr.ru/api'
-    SEARCH_OBJECT_BY_CADASTRAL_ID = (
-        BASE_URL + '/features/{object_type}?text={{cadastral_id}}&limit={{limit}}&'
-        + 'tolerance={{tolerance}}')
     SEARCH_OBJECT_BY_COORDINATES = (
         BASE_URL + '/features/{object_type}?text={{lat}}%20{{long}}&limit={{limit}}&'
         + 'tolerance={{tolerance}}')
     SEARCH_BUILDING_BY_COORDINATES_URL = SEARCH_OBJECT_BY_COORDINATES.format(object_type=5)
-    SEARCH_BUILDING_BY_CADASTRAL_ID_URL = SEARCH_OBJECT_BY_CADASTRAL_ID.format(object_type=5)
     SEARCH_PARCEL_BY_COORDINATES_URL = SEARCH_OBJECT_BY_COORDINATES.format(object_type=1)
 
     NSPD_SEARCH_URL = 'https://nspd.gov.ru/api/geoportal/v2/search/geoportal'
@@ -220,15 +216,16 @@ class TestPKKRosreestrAPIClient:
 
     @httpretty.activate
     def test_get_building_by_cadastral_id(self):
-        search_params = {
-            'cadastral_id': '71:00:000000:112278', 'limit': 1, 'tolerance': 170}
-        url = self.SEARCH_BUILDING_BY_CADASTRAL_ID_URL.format(**search_params)
+        cadastral_id = '77:01:0001005:2106'
         httpretty.register_uri(
-            method=httpretty.GET, uri=url,
+            method=httpretty.GET, uri=self.NSPD_SEARCH_URL,
             body=pkk_client_fixtures.BUILDING_BY_CADASTRAL_ID_RESPONSE,
             content_type=self.CONTENT_TYPE_JSON)
 
         api_client = PKKRosreestrAPIClient()
-        obj = api_client.get_building_by_cadastral_id(**search_params)
+        obj = api_client.get_building_by_cadastral_id(cadastral_id)
 
         assert pkk_client_fixtures.BUILDING_BY_CADASTRAL_ID == obj
+        request = httpretty.last_request()
+        assert {'thematicSearchId': ['1'], 'query': [cadastral_id]} == request.querystring
+        assert self.NSPD_REFERER == request.headers['Referer']
