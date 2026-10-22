@@ -1,7 +1,6 @@
-from unittest.mock import patch, MagicMock
-
 import pytest
 import httpretty
+import requests
 
 from tests import pkk_client_fixtures, rosreestr_client_fixtures
 from rosreestr_api.clients.rosreestr import (
@@ -39,7 +38,8 @@ class TestRosreestrAPIClient:
     REGION_TYPES_URL = f'{BASE_URL}/region_types/' + '{}/'
     SEARCH_OBJECTS_BY_RIGHT_URL = f'{BASE_URL}/right/' + '{}/{}/'
     SEARCH_OBJECTS_BY_ADDRESS_URL = 'https://lk.rosreestr.ru/account-back/address/search'
-    SEARCH_DETAILED_OBJECT_BY_ID = f'{BASE_URL}/fir_object/' + '{}/'
+    NSPD_SEARCH_URL = 'https://nspd.gov.ru/api/geoportal/v2/search/geoportal'
+    NSPD_REFERER = 'https://nspd.gov.ru/map?thematic=PKK'
 
     CONTENT_TYPE_JSON = 'application/json'
 
@@ -123,29 +123,31 @@ class TestRosreestrAPIClient:
 
     @httpretty.activate
     def test_get_object(self):
-        object_id = '177_385900460001'
-        url = self.SEARCH_DETAILED_OBJECT_BY_ID.format(object_id)
+        cadastral_id = '77:05:0007007:4926'
         httpretty.register_uri(
-            method=httpretty.GET, uri=url, body=rosreestr_client_fixtures.OBJECT_BY_ID_RESPONSE,
+            method=httpretty.GET, uri=self.NSPD_SEARCH_URL,
+            body=rosreestr_client_fixtures.OBJECT_BY_ID_RESPONSE,
             content_type=self.CONTENT_TYPE_JSON)
 
         api_client = RosreestrAPIClient()
-        obj = api_client.get_object(object_id)
+        obj = api_client.get_object(cadastral_id)
 
         assert rosreestr_client_fixtures.OBJECT_BY_ID == obj
+        request = httpretty.last_request()
+        assert {'thematicSearchId': ['1'], 'query': [cadastral_id]} == request.querystring
+        assert self.NSPD_REFERER == request.headers['Referer']
 
-    def test_get_object_strip_cadastral_id(self):
-        expected_arg = f'{self.BASE_URL}/fir_object/50:4:0:35646/'
-        object_id = '50:04:0000000:35646'
-        mock_http_client_instance = MagicMock(
-            **{'get.return_value': MagicMock(status_code=200)})
-        mock_http_client = MagicMock(return_value=mock_http_client_instance)
+    @httpretty.activate
+    def test_get_object_not_found(self):
+        httpretty.register_uri(
+            method=httpretty.GET, uri=self.NSPD_SEARCH_URL, status=404,
+            body=b'{"code": 204, "message": "no objects found"}',
+            content_type=self.CONTENT_TYPE_JSON)
 
-        with patch('rosreestr_api.clients.rosreestr.RosreestrHTTPClient', mock_http_client):
-            api_client = RosreestrAPIClient()
-        api_client.get_object(object_id)
+        api_client = RosreestrAPIClient()
 
-        mock_http_client_instance.get.assert_called_once_with(expected_arg)
+        with pytest.raises(requests.HTTPError):
+            api_client.get_object('77:17:0000000:11471')
 
 
 class TestPKKRosreestrAPIClient:
