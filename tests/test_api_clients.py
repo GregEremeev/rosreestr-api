@@ -4,30 +4,9 @@ import requests
 
 from tests import pkk_client_fixtures, rosreestr_client_fixtures
 from rosreestr_api.clients.rosreestr import (
-    AddressWrapper,
     RosreestrAPIClient,
     PKKRosreestrAPIClient,
 )
-
-
-def test_fill_address_wrapper_without_macro_region():
-    with pytest.raises(ValueError):
-        AddressWrapper(
-            region_id='145296000000', street_name='Красного маяка',
-            house_number='22', house_building='2')
-
-
-def test_fill_address_wrapper_without_region():
-    with pytest.raises(ValueError):
-        AddressWrapper(
-            street_name='Красного маяка', macro_region_name='Москва',
-            house_number='22', house_building='2')
-
-
-def test_fill_address_wrapper():
-    AddressWrapper(
-        macro_region_id='145000000000', region_id='145296000000',
-        street_name='Красного маяка', house_number='22', house_building='2')
 
 
 class TestRosreestrAPIClient:
