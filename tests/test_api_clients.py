@@ -11,27 +11,11 @@ from rosreestr_api.clients.rosreestr import (
 
 class TestRosreestrAPIClient:
 
-    BASE_URL = 'https://rosreestr.gov.ru/api/online'
-    SEARCH_OBJECTS_BY_RIGHT_URL = f'{BASE_URL}/right/' + '{}/{}/'
     SEARCH_OBJECTS_BY_ADDRESS_URL = 'https://lk.rosreestr.ru/account-back/address/search'
     NSPD_SEARCH_URL = 'https://nspd.gov.ru/api/geoportal/v2/search/geoportal'
     NSPD_REFERER = 'https://nspd.gov.ru/map?thematic=PKK'
 
     CONTENT_TYPE_JSON = 'application/json'
-
-    @httpretty.activate
-    def test_get_objects_by_right(self):
-        region_number = '177'
-        right_id = '50-50-21-042-2012-234'
-        url = self.SEARCH_OBJECTS_BY_RIGHT_URL.format(region_number, right_id)
-        httpretty.register_uri(
-            method=httpretty.GET, uri=url, body=rosreestr_client_fixtures.RIGHT_RESPONSE,
-            content_type=self.CONTENT_TYPE_JSON)
-
-        api_client = RosreestrAPIClient()
-        objects = api_client.get_objects_by_right(region_number, right_id)
-
-        assert rosreestr_client_fixtures.RIGHT_OBJECTS == objects
 
     @httpretty.activate
     def test_get_objects_by_address(self):

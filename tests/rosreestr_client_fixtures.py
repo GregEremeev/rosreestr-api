@@ -1,17 +1,6 @@
 import json
 
 
-RIGHT_OBJECTS = [
-    {"objectId": "177_1357453010001", "srcObject": 2, "regionKey":177, "objectType": None,
-     "objectCn": "77:17:0120316:9111", "objectCon": None, "subjectId": 145000000000,
-     "regionId": 145297000000, "settlementId": 145297574000, "street": None, "house": "||",
-     "addressNotes": "г.Москва, п.Сосенское, пос.Коммунарка",
-     "okato": None, "apartment": None, "nobjectCn": "77:17:120316:9111",
-     "nobjectCon": None}
-]
-RIGHT_RESPONSE = json.dumps(RIGHT_OBJECTS).encode('utf-8')
-
-
 OBJECTS_BY_ADDRESS = [
     {
         'cadnum': '77:05:0007007:4926',
