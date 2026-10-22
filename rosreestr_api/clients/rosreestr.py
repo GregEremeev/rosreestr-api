@@ -1,6 +1,5 @@
 import logging
 import math
-from urllib.parse import quote_plus
 
 import requests
 from fake_useragent import UserAgent
@@ -15,9 +14,7 @@ EARTH_RADIUS = 6378137
 
 class RosreestrAPIClient:
 
-    BASE_URL = 'https://rosreestr.gov.ru/api/online'
     SEARCH_OBJECTS_BY_ADDRESS_URL = 'https://lk.rosreestr.ru/account-back/address/search'
-    SEARCH_OBJECTS_BY_RIGHT_URL = f'{BASE_URL}/right/' + '{}/{}/'
 
     def __init__(self, timeout=5, keep_alive=False):
         self._http_client = RosreestrHTTPClient(
@@ -35,10 +32,6 @@ class RosreestrAPIClient:
             return ''
         else:
             return response.json()
-
-    def get_objects_by_right(self, region_number: str, right_number: str):
-        url = self.SEARCH_OBJECTS_BY_RIGHT_URL.format(region_number, quote_plus(right_number))
-        return self._get_response_body(self._http_client.get(url))
 
     def get_objects_by_address(self, address: str):
         # rosreestr.gov.ru/api/online was replaced by lk.rosreestr.ru, whose
