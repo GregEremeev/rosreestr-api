@@ -159,28 +159,36 @@ class TestPKKRosreestrAPIClient:
         BASE_URL + '/features/{object_type}?text={{lat}}%20{{long}}&limit={{limit}}&'
         + 'tolerance={{tolerance}}')
     SEARCH_BUILDING_BY_COORDINATES_URL = SEARCH_OBJECT_BY_COORDINATES.format(object_type=5)
-    SEARCH_PARCEL_BY_COORDINATES_URL = SEARCH_OBJECT_BY_COORDINATES.format(object_type=1)
 
     NSPD_SEARCH_URL = 'https://nspd.gov.ru/api/geoportal/v2/search/geoportal'
+    NSPD_PARCELS_WMS_URL = 'https://nspd.gov.ru/api/aeggis/v3/36048/wms'
     NSPD_REFERER = 'https://nspd.gov.ru/map?thematic=PKK'
 
     CONTENT_TYPE_JSON = 'application/json'
 
     @httpretty.activate
     def test_get_parcel_by_coordinates(self):
-        search_params = {
-            'lat': 55.542, 'long': 37.483,
-            'limit': 11, 'tolerance': 2}
-        url = self.SEARCH_PARCEL_BY_COORDINATES_URL.format(**search_params)
         httpretty.register_uri(
-            method=httpretty.GET, uri=url,
+            method=httpretty.GET, uri=self.NSPD_PARCELS_WMS_URL,
             body=pkk_client_fixtures.PARCEL_BY_COORDINATES_RESPONSE,
             content_type=self.CONTENT_TYPE_JSON)
 
         api_client = PKKRosreestrAPIClient()
-        obj = api_client.get_parcel_by_coordinates(**search_params)
+        obj = api_client.get_parcel_by_coordinates(lat=55.761, long=37.6096, limit=5)
 
         assert pkk_client_fixtures.PARCEL_BY_COORDINATES == obj
+        request = httpretty.last_request()
+        query = {key: value[0] for key, value in request.querystring.items()}
+        assert 'GetFeatureInfo' == query['REQUEST']
+        assert '36048' == query['LAYERS'] == query['QUERY_LAYERS']
+        assert 'EPSG:3857' == query['CRS']
+        assert 'application/json' == query['INFO_FORMAT']
+        assert '5' == query['FEATURE_COUNT']
+        min_x, min_y, max_x, max_y = map(float, query['BBOX'].split(','))
+        # the point in EPSG:3857
+        assert (min_x + max_x) / 2 == pytest.approx(4186681.52, abs=0.01)
+        assert (min_y + max_y) / 2 == pytest.approx(7510983.89, abs=0.01)
+        assert self.NSPD_REFERER == request.headers['Referer']
 
     @httpretty.activate
     def test_get_parcel_by_cadastral_id(self):

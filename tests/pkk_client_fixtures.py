@@ -2,24 +2,71 @@ import json
 
 
 PARCEL_BY_COORDINATES = {
+    'type': 'FeatureCollection',
     'features': [
-        {'attrs': {
-            'address': 'Москва, п Сосенское, д Столбово, з/у 3/1',
-            'cn': '77:17:0000000:11471',
-            'id': '77:17:0:11471'},
-         'center': {'x': 4172677.635874182, 'y': 7467970.62866414},
-         'extent': {
-             'xmax': 4173270.1685763774,
-             'xmin': 4171926.086091824,
-             'ymax': 7468416.583502886,
-             'ymin': 7467322.552103312
-         },
-         'sort': 7717000000011471,
-         'type': 1}
-    ],
-    'note': '',
-    'status': 200,
-    'total': None
+        {
+            'id': 107884024,
+            'type': 'Feature',
+            'geometry': {
+                'type': 'Polygon',
+                'coordinates': [
+                    [
+                        [4186735.1563343047, 7510872.4871132625],
+                        [4186759.1133232918, 7510828.219564488],
+                        [4186839.2036212482, 7510680.176274887],
+                        [4186840.5647401814, 7510677.526427105],
+                        [4186735.1563343047, 7510872.4871132625]
+                    ]
+                ],
+                'crs': {
+                    'type': 'name',
+                    'properties': {
+                        'name': 'EPSG:3857'
+                    }
+                }
+            },
+            'properties': {
+                'cadastralDistrictsCode': 77,
+                'category': 36368,
+                'categoryName': 'Земельные участки ЕГРН',
+                'descr': '77:01:0001044:79',
+                'externalKey': '77:01:0001044:79',
+                'interactionId': 107818319,
+                'label': '77:01:0001044:79',
+                'options': {
+                    'area': None,
+                    'cad_num': '77:01:0001044:79',
+                    'cost_application_date': '2025-01-01',
+                    'cost_approvement_date': '',
+                    'cost_determination_date': '2024-01-01',
+                    'cost_index': 112070.59,
+                    'cost_registration_date': '2024-12-08',
+                    'cost_value': 827628979.39,
+                    'declared_area': 7384.89,
+                    'determination_couse': 'Акт об утверждении результатов определения кадастровой стоимости, полученных в соответствии с положениями Закона 237-ФЗ',
+                    'land_record_area': 7384.89,
+                    'land_record_category_type': 'Земли населенных пунктов',
+                    'land_record_reg_date': '2007-01-01',
+                    'land_record_subtype': 'Землепользование',
+                    'land_record_type': 'Земельный участок',
+                    'ownership_type': None,
+                    'permitted_use_established_by_document': 'эксплуатации улично-дорожной сети',
+                    'previously_posted': 'Ранее учтенный',
+                    'quarter_cad_number': '77:01:0001044',
+                    'readable_address': 'Российская Федерация, г. Москва, вн.тер.г. муниципальный округ Тверской, ул. Тверская, з/у 2Д',
+                    'specified_area': None,
+                    'status': 'Ранее учтенный'
+                },
+                'subcategory': 5,
+                'systemInfo': {
+                    'inserted': '2024-02-22T13:46:07.506382',
+                    'insertedBy': '7EF5CD0B-AC08-4097-AF2B-07CD85992A79',
+                    'updated': '2026-10-21T15:18:30.189037',
+                    'updatedBy': '7EF5CD0B-AC08-4097-AF2B-07CD85992A79'
+                }
+            }
+        }
+    ]
 }
 PARCEL_BY_COORDINATES_RESPONSE = json.dumps(PARCEL_BY_COORDINATES).encode('utf-8')
 

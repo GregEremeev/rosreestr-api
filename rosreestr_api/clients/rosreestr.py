@@ -1,4 +1,5 @@
 import logging
+import math
 from dataclasses import dataclass
 from urllib.parse import quote_plus
 
@@ -8,6 +9,9 @@ from fake_useragent import UserAgent
 from rosreestr_api.clients.http import RosreestrHTTPClient
 
 logger = logging.getLogger(__name__)
+
+# WGS 84 semi-major axis in metres, used by EPSG:3857
+EARTH_RADIUS = 6378137
 
 
 @dataclass
@@ -170,7 +174,6 @@ class PKKRosreestrAPIClient:
         BASE_URL + '/features/{object_type}?text={{lat}}%20{{long}}&limit={{limit}}&'
         + 'tolerance={{tolerance}}')
     SEARCH_BUILDING_BY_COORDINATES_URL = SEARCH_OBJECT_BY_COORDINATES.format(object_type=5)
-    SEARCH_PARCEL_BY_COORDINATES_URL = SEARCH_OBJECT_BY_COORDINATES.format(object_type=1)
 
     # pkk.rosreestr.ru was replaced by nspd.gov.ru on 23.12.2024
     NSPD_BASE_URL = 'https://nspd.gov.ru/api'
@@ -180,6 +183,13 @@ class PKKRosreestrAPIClient:
     NSPD_REAL_ESTATE_THEMATIC_SEARCH_ID = 1
     SEARCH_PARCEL_BY_CADASTRAL_ID_URL = NSPD_SEARCH_URL
     SEARCH_BUILDING_BY_CADASTRAL_ID_URL = NSPD_SEARCH_URL
+    NSPD_WMS_URL = NSPD_BASE_URL + '/aeggis/v3/{layer_id}/wms'
+    NSPD_PARCELS_LAYER_ID = 36048
+    SEARCH_PARCEL_BY_COORDINATES_URL = NSPD_WMS_URL.format(layer_id=NSPD_PARCELS_LAYER_ID)
+    # GetFeatureInfo asks what lies under the centre pixel of a small map
+    # image around the point; nspd works in EPSG:3857 only
+    NSPD_FEATURE_INFO_IMAGE_SIZE = 512
+    NSPD_FEATURE_INFO_BBOX_HALF_SIZE = 10  # metres in EPSG:3857
 
     def __init__(self, timeout=5, keep_alive=False):
         self._http_client = RosreestrHTTPClient(
@@ -188,16 +198,21 @@ class PKKRosreestrAPIClient:
             default_headers={'User-Agent': UserAgent().random, 'Referer': self.NSPD_REFERER}
         )
 
-    def get_parcel_by_coordinates(self, *, lat, long, limit=11, tolerance=2) -> dict:
-        url = self.SEARCH_PARCEL_BY_COORDINATES_URL.format(
-            lat=lat, long=long, limit=limit, tolerance=tolerance)
-        return self._http_client.get(url).json()
+    def get_parcel_by_coordinates(self, *, lat, long, limit=11) -> dict:
+        return self._get_feature_info(
+            self.SEARCH_PARCEL_BY_COORDINATES_URL, self.NSPD_PARCELS_LAYER_ID,
+            lat=lat, long=long, limit=limit)
 
     def get_parcel_by_cadastral_id(self, cadastral_id) -> dict:
         return self._search_by_cadastral_id(self.SEARCH_PARCEL_BY_CADASTRAL_ID_URL, cadastral_id)
 
     def get_building_by_cadastral_id(self, cadastral_id) -> dict:
         return self._search_by_cadastral_id(self.SEARCH_BUILDING_BY_CADASTRAL_ID_URL, cadastral_id)
+
+    def get_building_by_coordinates(self, *, lat, long, limit=11, tolerance=2) -> dict:
+        url = self.SEARCH_BUILDING_BY_COORDINATES_URL.format(
+            lat=lat, long=long, limit=limit, tolerance=tolerance)
+        return self._http_client.get(url).json()
 
     def _search_by_cadastral_id(self, url, cadastral_id) -> dict:
         params = {
@@ -206,10 +221,36 @@ class PKKRosreestrAPIClient:
         }
         return self._http_client.get(url, params=params).json()
 
-    def get_building_by_coordinates(self, *, lat, long, limit=11, tolerance=2) -> dict:
-        url = self.SEARCH_BUILDING_BY_COORDINATES_URL.format(
-            lat=lat, long=long, limit=limit, tolerance=tolerance)
-        return self._http_client.get(url).json()
+    def _get_feature_info(self, url, layer_id, *, lat, long, limit) -> dict:
+        x, y = _wgs84_to_web_mercator(lat=lat, long=long)
+        half_size = self.NSPD_FEATURE_INFO_BBOX_HALF_SIZE
+        image_size = self.NSPD_FEATURE_INFO_IMAGE_SIZE
+        params = {
+            'SERVICE': 'WMS',
+            'VERSION': '1.3.0',
+            'REQUEST': 'GetFeatureInfo',
+            'LAYERS': layer_id,
+            'QUERY_LAYERS': layer_id,
+            'STYLES': '',
+            # nspd responds with 500 when FORMAT is missing
+            'FORMAT': 'image/png',
+            'INFO_FORMAT': 'application/json',
+            'FEATURE_COUNT': limit,
+            'CRS': 'EPSG:3857',
+            'BBOX': f'{x - half_size},{y - half_size},{x + half_size},{y + half_size}',
+            'WIDTH': image_size,
+            'HEIGHT': image_size,
+            'I': image_size // 2,
+            'J': image_size // 2,
+        }
+        return self._http_client.get(url, params=params).json()
+
+
+def _wgs84_to_web_mercator(*, lat, long):
+    # https://epsg.io/3857, spherical Mercator projection of WGS 84 (EPSG:4326)
+    x = math.radians(long) * EARTH_RADIUS
+    y = math.log(math.tan(math.pi / 4 + math.radians(lat) / 2)) * EARTH_RADIUS
+    return x, y
 
 
 def _strip_cadastral_id(cadastral_id):
