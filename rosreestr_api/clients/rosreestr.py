@@ -1,6 +1,5 @@
 import logging
 import math
-from dataclasses import dataclass
 from urllib.parse import quote_plus
 
 import requests
@@ -12,28 +11,6 @@ logger = logging.getLogger(__name__)
 
 # WGS 84 semi-major axis in metres, used by EPSG:3857
 EARTH_RADIUS = 6378137
-
-
-@dataclass
-class AddressWrapper:
-
-    street_name: str
-    house_number: str
-    macro_region_id: str = ''
-    region_id: str = ''
-    house_building: str = ''
-    house_structure: str = ''
-    apartment: str = ''
-    macro_region_type: str = ''
-
-    region_name: str = ''
-    macro_region_name: str = ''
-
-    def __post_init__(self):
-        is_region_filled = self.region_name or self.region_id
-        is_macro_region_filled = self.macro_region_name or self.macro_region_id
-        if not (is_macro_region_filled and is_region_filled):
-            raise ValueError('You have to provide region and macro region values')
 
 
 class RosreestrAPIClient:
