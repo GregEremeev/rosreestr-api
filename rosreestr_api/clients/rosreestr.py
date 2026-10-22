@@ -23,16 +23,6 @@ class RosreestrAPIClient:
             default_headers={'User-Agent': UserAgent().random}
         )
 
-    def _get_response_body(self, response: requests.Response):
-        status_code = response.status_code
-        if status_code >= 400:
-            response.raise_for_status()
-        elif status_code == 204:
-            logger.info('There was an empty response body')
-            return ''
-        else:
-            return response.json()
-
     def get_objects_by_address(self, address: str):
         # rosreestr.gov.ru/api/online was replaced by lk.rosreestr.ru, whose
         # address search is free text, e.g. 'Москва, ул Красного Маяка, д 22, к 2, кв 187'.
@@ -48,19 +38,15 @@ class RosreestrAPIClient:
         else:
             return []
 
-    def get_object(self, cadastral_id: str):
-        # rosreestr.gov.ru/api/online was shut down; nspd.gov.ru has the same
-        # details for parcels, buildings and premises, by the full cadastral id only
-        params = {
-            'thematicSearchId': NSPDAPIClient.NSPD_REAL_ESTATE_THEMATIC_SEARCH_ID,
-            'query': cadastral_id,
-        }
-        headers = {'Referer': NSPDAPIClient.NSPD_REFERER}
-        logger.info(f'Trying to download detailed object, cadastral_id: {cadastral_id}')
-        response = self._http_client.get(
-            NSPDAPIClient.NSPD_SEARCH_URL, params=params, headers=headers)
-        logger.info(f'Detailed object was downloaded, cadastral_id: {cadastral_id}')
-        return self._get_response_body(response)
+    def _get_response_body(self, response: requests.Response):
+        status_code = response.status_code
+        if status_code >= 400:
+            response.raise_for_status()
+        elif status_code == 204:
+            logger.info('There was an empty response body')
+            return ''
+        else:
+            return response.json()
 
 
 class NSPDAPIClient:
@@ -78,6 +64,7 @@ class NSPDAPIClient:
     NSPD_REAL_ESTATE_THEMATIC_SEARCH_ID = 1
     SEARCH_PARCEL_BY_CADASTRAL_ID_URL = NSPD_SEARCH_URL
     SEARCH_BUILDING_BY_CADASTRAL_ID_URL = NSPD_SEARCH_URL
+    SEARCH_OBJECT_BY_CADASTRAL_ID_URL = NSPD_SEARCH_URL
     NSPD_WMS_URL = NSPD_BASE_URL + '/aeggis/v3/{layer_id}/wms'
     NSPD_PARCELS_LAYER_ID = 36048
     NSPD_BUILDINGS_LAYER_ID = 36049
@@ -105,6 +92,10 @@ class NSPDAPIClient:
 
     def get_building_by_cadastral_id(self, cadastral_id) -> dict:
         return self._search_by_cadastral_id(self.SEARCH_BUILDING_BY_CADASTRAL_ID_URL, cadastral_id)
+
+    def get_object(self, cadastral_id) -> dict:
+        # any object by its full cadastral id: parcels, buildings and premises
+        return self._search_by_cadastral_id(self.SEARCH_OBJECT_BY_CADASTRAL_ID_URL, cadastral_id)
 
     def get_building_by_coordinates(self, *, lat, long, limit=11) -> dict:
         return self._get_feature_info(

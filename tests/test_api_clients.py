@@ -1,6 +1,7 @@
+import json
+
 import pytest
 import httpretty
-import requests
 
 from tests import nspd_client_fixtures, rosreestr_client_fixtures
 from rosreestr_api.clients.rosreestr import (
@@ -12,8 +13,6 @@ from rosreestr_api.clients.rosreestr import (
 class TestRosreestrAPIClient:
 
     SEARCH_OBJECTS_BY_ADDRESS_URL = 'https://lk.rosreestr.ru/account-back/address/search'
-    NSPD_SEARCH_URL = 'https://nspd.gov.ru/api/geoportal/v2/search/geoportal'
-    NSPD_REFERER = 'https://nspd.gov.ru/map?thematic=PKK'
 
     CONTENT_TYPE_JSON = 'application/json'
 
@@ -40,34 +39,6 @@ class TestRosreestrAPIClient:
         api_client = RosreestrAPIClient()
 
         assert [] == api_client.get_objects_by_address('Казань, Ибрагимова 53б, кв 1')
-
-    @httpretty.activate
-    def test_get_object(self):
-        cadastral_id = '77:05:0007007:4926'
-        httpretty.register_uri(
-            method=httpretty.GET, uri=self.NSPD_SEARCH_URL,
-            body=rosreestr_client_fixtures.OBJECT_BY_ID_RESPONSE,
-            content_type=self.CONTENT_TYPE_JSON)
-
-        api_client = RosreestrAPIClient()
-        obj = api_client.get_object(cadastral_id)
-
-        assert rosreestr_client_fixtures.OBJECT_BY_ID == obj
-        request = httpretty.last_request()
-        assert {'thematicSearchId': ['1'], 'query': [cadastral_id]} == request.querystring
-        assert self.NSPD_REFERER == request.headers['Referer']
-
-    @httpretty.activate
-    def test_get_object_not_found(self):
-        httpretty.register_uri(
-            method=httpretty.GET, uri=self.NSPD_SEARCH_URL, status=404,
-            body=b'{"code": 204, "message": "no objects found"}',
-            content_type=self.CONTENT_TYPE_JSON)
-
-        api_client = RosreestrAPIClient()
-
-        with pytest.raises(requests.HTTPError):
-            api_client.get_object('77:17:0000000:11471')
 
 
 class TestNSPDAPIClient:
@@ -156,3 +127,30 @@ class TestNSPDAPIClient:
         request = httpretty.last_request()
         assert {'thematicSearchId': ['1'], 'query': [cadastral_id]} == request.querystring
         assert self.NSPD_REFERER == request.headers['Referer']
+
+    @httpretty.activate
+    def test_get_object(self):
+        cadastral_id = '77:05:0007007:4926'
+        httpretty.register_uri(
+            method=httpretty.GET, uri=self.NSPD_SEARCH_URL,
+            body=nspd_client_fixtures.OBJECT_BY_ID_RESPONSE,
+            content_type=self.CONTENT_TYPE_JSON)
+
+        api_client = NSPDAPIClient()
+        obj = api_client.get_object(cadastral_id)
+
+        assert nspd_client_fixtures.OBJECT_BY_ID == obj
+        request = httpretty.last_request()
+        assert {'thematicSearchId': ['1'], 'query': [cadastral_id]} == request.querystring
+        assert self.NSPD_REFERER == request.headers['Referer']
+
+    @httpretty.activate
+    def test_get_object_not_found(self):
+        not_found = {'code': 204, 'message': 'no objects found'}
+        httpretty.register_uri(
+            method=httpretty.GET, uri=self.NSPD_SEARCH_URL, status=404,
+            body=json.dumps(not_found), content_type=self.CONTENT_TYPE_JSON)
+
+        api_client = NSPDAPIClient()
+
+        assert not_found == api_client.get_object('77:17:0000000:11471')
