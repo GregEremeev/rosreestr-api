@@ -128,5 +128,99 @@ BUILDING_BY_COORDINATES = {
 }
 BUILDING_BY_COORDINATES_RESPONSE = json.dumps(BUILDING_BY_COORDINATES).encode('utf-8')
 
-BUILDING_BY_CADASTRAL_ID = BUILDING_BY_COORDINATES
+BUILDING_BY_CADASTRAL_ID = {
+    'data': {
+        'type': 'FeatureCollection',
+        'features': [
+            {
+                'id': 426068044,
+                'type': 'Feature',
+                'geometry': {
+                    'type': 'MultiPolygon',
+                    'coordinates': [
+                        [
+                            [
+                                [4186818.703101783, 7510723.087208178],
+                                [4186818.588962701, 7510723.098658164],
+                                [4186818.4792457945, 7510723.132203082],
+                                [4186818.3781674206, 7510723.186553819],
+                                [4186818.703101783, 7510723.087208178]
+                            ]
+                        ],
+                        [
+                            [
+                                [4186639.5303060245, 7511054.878903374],
+                                [4186639.350930481, 7511055.1855010465],
+                                [4186645.172595911, 7511058.606023198],
+                                [4186645.351971303, 7511058.299425252],
+                                [4186639.5303060245, 7511054.878903374]
+                            ]
+                        ]
+                    ],
+                    'crs': {
+                        'type': 'name',
+                        'properties': {
+                            'name': 'EPSG:3857'
+                        }
+                    }
+                },
+                'properties': {
+                    'cadastralDistrictsCode': 77,
+                    'category': 36383,
+                    'categoryName': 'Сооружения',
+                    'descr': '77:01:0001005:2106',
+                    'externalKey': '77:01:0001005:2106',
+                    'interactionId': 408542429,
+                    'label': '77:01:0001005:2106',
+                    'options': {
+                        'address_readable_address': 'г. Москва, ул. Тверская',
+                        'cad_number': '77:01:0001005:2106',
+                        'cost_application_date': '2026-01-01',
+                        'cost_approvement_date': '',
+                        'cost_determination_date': '2025-01-01',
+                        'cost_index': 1324.64,
+                        'cost_registration_date': '2025-12-11',
+                        'cost_value': 2976466.08,
+                        'cultural_heritage_val': '',
+                        'determination_couse': 'Акт об утверждении результатов определения кадастровой стоимости, полученных в соответствии с положениями Закона 237-ФЗ',
+                        'facility_cad_number': '',
+                        'object_type_value': 'Сооружение',
+                        'ownership_type': 'Частная',
+                        'params_area': 0,
+                        'params_built_up_area': 0,
+                        'params_depth': 0,
+                        'params_extension': 2247,
+                        'params_floors': '',
+                        'params_height': 0,
+                        'params_name': 'Телефонная канализация',
+                        'params_occurence_depth': 0,
+                        'params_purpose': 'коммунальное',
+                        'params_underground_floors': '',
+                        'params_volume': 0,
+                        'params_year_built': '',
+                        'params_year_commisioning': '1950',
+                        'permitted_uses_name': None,
+                        'quarter_cad_number': '77:01:0000000',
+                        'registration_date': '2013-11-25',
+                        'status': 'Ранее учтенный',
+                        'united_cad_number': ''
+                    },
+                    'subcategory': 1,
+                    'systemInfo': {
+                        'inserted': '2024-12-09T10:40:13.886576',
+                        'insertedBy': '7EF5CD0B-AC08-4097-AF2B-07CD85992A79',
+                        'updated': '2026-09-16T21:00:06.158388',
+                        'updatedBy': '7EF5CD0B-AC08-4097-AF2B-07CD85992A79'
+                    }
+                }
+            }
+        ]
+    },
+    'meta': [
+        {
+            'totalCount': 1,
+            'categoryId': 36383
+        }
+    ]
+}
 BUILDING_BY_CADASTRAL_ID_RESPONSE = json.dumps(BUILDING_BY_CADASTRAL_ID).encode('utf-8')
