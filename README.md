@@ -18,17 +18,17 @@ api_client = RosreestrAPIClient()
 # get objects by address: returns up to 100 objects with `cadnum`, `full_name`,
 # `actual` and `type` (OKS, PARCEL or FLAT), near matches included
 api_client.get_objects_by_address('Москва, ул Красного Маяка, д 22, к 2, кв 187')
-
-# get object details by its full cadastral id (`cadnum` in the results above):
-# parcels, buildings and premises
-api_client.get_object('77:05:0007007:4926')
 ```
 
 3 Different ways how to get geo info about realty objects:
 ```python
-from rosreestr_api.clients.rosreestr import PKKRosreestrAPIClient
+from rosreestr_api.clients.rosreestr import NSPDAPIClient
 
-api_client = PKKRosreestrAPIClient()
+api_client = NSPDAPIClient()
+
+# get object details by its full cadastral id (e.g. `cadnum` returned by
+# RosreestrAPIClient.get_objects_by_address): parcels, buildings and premises
+api_client.get_object('77:05:0007007:4926')
 
 # get building by cadastral id
 api_client.get_building_by_cadastral_id('16:50:110108:2815')
