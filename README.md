@@ -19,8 +19,9 @@ api_client = RosreestrAPIClient()
 # `actual` and `type` (OKS, PARCEL or FLAT), near matches included
 api_client.get_objects_by_address('Москва, ул Красного Маяка, д 22, к 2, кв 187')
 
-# get object by id (the same as cadastral id for parcel objects, look at `objectId` key)
-api_client.get_object('77:5:7007:4926')
+# get object details by its full cadastral id (`cadnum` in the results above):
+# parcels, buildings and premises
+api_client.get_object('77:05:0007007:4926')
 
 # get objects by region number and right number
 api_client.get_objects_by_right(region_number=177, right_number='50-50-21/042/2012-234')

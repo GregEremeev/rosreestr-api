@@ -68,94 +68,60 @@ OBJECTS_BY_ADDRESS_RESPONSE = json.dumps(OBJECTS_BY_ADDRESS).encode('utf-8')
 
 
 OBJECT_BY_ID = {
-    'objectId': '177_385900460001',
-    'type': 'premises',
-    'regionKey': 177,
-    'source': 2,
-    'firActualDate': '2016-12-09',
-    'objectData':
-        {
-            'id': '177_385900460001',
-            'regionKey': 177,
-            'srcObject': 2,
-            'objectType': '002002002000',
-            'objectName': 'квартира',
-            'removed': 0,
-            'dateLoad': '2015-01-11',
-            'addressNote': 'г.Москва, ул.Красного Маяка, д.22, корп.2, кв.187',
-            'objectCn': '77:05:0007007:4926',
-            'objectCon': '77-77-09/088/2012-638',
-            'objectInv': None,
-            'objectUn': '77:05:0007007:4926',
-            'rsCode': '77.0.6.5',
-            'actualDate': '2015-01-11',
-            'brkStatus': -1,
-            'brkDate': None,
-            'formRights': '100',
-            'objectAddress': {
-                'id': '177_385900460001',
-                'regionKey': 177,
-                'okato': '45296595000',
-                'kladr': None,
-                'region': '77',
-                'district': None,
-                'districtType': 'неопр',
-                'place': None,
-                'placeType': 'неопр',
-                'locality': None,
-                'localityType': 'неопр',
-                'street': 'Красного Маяка',
-                'streetType': 'ул',
-                'house': '22',
-                'building': '2',
-                'structure': None,
-                'apartment': '187',
-                'addressNotes': 'г.Москва, ул.Красного Маяка, д.22, корп.2, кв.187',
-                'mergedAddress': 'ул Красного Маяка, д. 22 (2), 187'
+    'data': {
+        'type': 'FeatureCollection',
+        'features': [
+            {
+                'id': 3225793942,
+                'type': 'Feature',
+                'geometry': {
+                    'type': 'Point',
+                    'coordinates': [4183234.922503614, 7481488.382915592],
+                    'crs': {
+                        'type': 'name',
+                        'properties': {
+                            'name': 'EPSG:3857'
+                        }
+                    }
+                },
+                'properties': {
+                    'category': 37163,
+                    'categoryName': 'Помещения',
+                    'options': {
+                        'area': 76.7,
+                        'cad_number': '77:05:0007007:4926',
+                        'cancel_date': None,
+                        'common_data_status': 'Ранее учтенный',
+                        'common_property': 'false',
+                        'cost_index': 212482.31,
+                        'cost_value': 16297393.18,
+                        'facility_cad_number': None,
+                        'floor': [
+                            '14/Этаж'
+                        ],
+                        'geocoderObject': True,
+                        'objdocId': 3225793942,
+                        'ownership_type': 'Частная',
+                        'params_type': 'Квартира',
+                        'parent_cad_number': '77:05:0007007:1045',
+                        'purpose': 'Жилое',
+                        'readable_address': 'Российская Федерация, г. Москва, вн.тер.г. муниципальный округ Чертаново Центральное, ул. Красного Маяка, д. 22 к. 2, кв. 187',
+                        'registersId': 36455,
+                        'registration_date': '2012-05-26T00:00:00Z',
+                        'removed_GCU': False,
+                        'service_common_property': None,
+                        'type': 'Помещение'
+                    }
+                }
             }
-        },
-    'parcelData': None,
-    'realtyData': None,
-    'premisesData': {'id': '177_385900460001',
-    'regionKey': 177,
-    'premisesCn': '77:05:0007007:4926',
-    'premisesCon': '77-77-09/088/2012-638',
-    'premisesInv': None,
-    'premisesUn': '77:05:0007007:4926',
-    'literBti': None,
-    'premisesType': '002002002000',
-    'assignType': None,
-    'premisesName': 'квартира',
-    'areaValue': 76.7,
-    'areaType': '060001003000',
-    'areaUnit': '012002001000',
-    'premisesFloor': 14,
-    'premisesFloorStr': '14',
-    'premisesNum': '187',
-    'premisesTypeValue': None,
-    'areaUnitValue': None,
-    'rightsReg': True,
-    'multiFlat': False,
-    'premisesTypeStr': 'Помещение'},
-    'rightEncumbranceObjects': [
-        {'rightData': {
-            'tempId': 0,
-            'id': '177_337945941001',
-            'objectId': '177_385900460001',
-            'updatePackId': 0,
-            'regionKey': 177,
-            'code': '001003000000',
-            'codeDesc': 'Общая совместная собственность',
-            'partSize': None,
-            'type': None,
-            'regNum': '77-77-09/088/2012-638',
-            'regDate': '2012-11-22',
-            'rsCode': '77.0.6.5',
-            'packageId': '7ce6c767-4ecc-4e9a-a792-136568c24d8d',
-            'actualDate': '2015-01-11'},
-           'encumbrances': None
-        }],
- 'oldNumbers': None
+        ]
+    },
+    'meta': [
+        {
+            'totalCount': 1,
+            'categoryId': 37163
+        }
+    ]
 }
 OBJECT_BY_ID_RESPONSE = json.dumps(OBJECT_BY_ID).encode('utf-8')
 

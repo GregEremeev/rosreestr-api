@@ -44,7 +44,6 @@ class RosreestrAPIClient:
     REGION_TYPES_URL = f'{BASE_URL}/region_types/' + '{}/'
     SEARCH_OBJECTS_BY_ADDRESS_URL = 'https://lk.rosreestr.ru/account-back/address/search'
     SEARCH_OBJECTS_BY_RIGHT_URL = f'{BASE_URL}/right/' + '{}/{}/'
-    SEARCH_DETAILED_OBJECT_BY_ID = f'{BASE_URL}/fir_object/' + '{}/'
 
     def __init__(self, timeout=5, keep_alive=False):
         self._http_client = RosreestrHTTPClient(
@@ -107,12 +106,18 @@ class RosreestrAPIClient:
         else:
             return []
 
-    def get_object(self, obj_id: str):
-        obj_id = _strip_cadastral_id(obj_id)
-        url = self.SEARCH_DETAILED_OBJECT_BY_ID.format(obj_id)
-        logger.info(f'Trying to download detailed object, object_id: {obj_id}')
-        response = self._http_client.get(url)
-        logger.info(f'Detailed object was downloaded, object_id: {obj_id}')
+    def get_object(self, cadastral_id: str):
+        # rosreestr.gov.ru/api/online was shut down; nspd.gov.ru has the same
+        # details for parcels, buildings and premises, by the full cadastral id only
+        params = {
+            'thematicSearchId': PKKRosreestrAPIClient.NSPD_REAL_ESTATE_THEMATIC_SEARCH_ID,
+            'query': cadastral_id,
+        }
+        headers = {'Referer': PKKRosreestrAPIClient.NSPD_REFERER}
+        logger.info(f'Trying to download detailed object, cadastral_id: {cadastral_id}')
+        response = self._http_client.get(
+            PKKRosreestrAPIClient.NSPD_SEARCH_URL, params=params, headers=headers)
+        logger.info(f'Detailed object was downloaded, cadastral_id: {cadastral_id}')
         return self._get_response_body(response)
 
 
@@ -201,12 +206,3 @@ def _wgs84_to_web_mercator(*, lat, long):
     x = math.radians(long) * EARTH_RADIUS
     y = math.log(math.tan(math.pi / 4 + math.radians(lat) / 2)) * EARTH_RADIUS
     return x, y
-
-
-def _strip_cadastral_id(cadastral_id):
-    stripped_cadastral_id = []
-    cadastral_id = cadastral_id.split(':')
-    for part in cadastral_id:
-        if part:
-            stripped_cadastral_id.append(part[:-1].lstrip('0') + part[-1])
-    return ':'.join(stripped_cadastral_id)
