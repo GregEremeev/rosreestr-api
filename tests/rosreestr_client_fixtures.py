@@ -52,22 +52,16 @@ RIGHT_RESPONSE = json.dumps(RIGHT_OBJECTS).encode('utf-8')
 
 OBJECTS_BY_ADDRESS = [
     {
-        'objectId': '177_385900460001',
-        'srcObject': 2,
-        'regionKey': 177,
-        'objectType': '002002002000',
-        'objectCn': '77:05:0007007:4926',
-        'objectCon': '77-77-09/088/2012-638',
-        'subjectId': 145000000000,
-        'regionId': 145296000000,
-        'settlementId': 145296595000,
-        'street': 'КРАСНОГО МАЯКА|УЛ',
-        'house': '22|2|',
-        'addressNotes': 'г.Москва, ул.Красного Маяка, д.22, корп.2, кв.187',
-        'okato': None,
-        'apartment': '187',
-        'nobjectCn': '77:5:7007:4926',
-        'nobjectCon': '77-77-9/88/2012-638'
+        'cadnum': '77:05:0007007:4926',
+        'full_name': 'Российская Федерация, г. Москва, вн.тер.г. муниципальный округ Чертаново Центральное, ул. Красного Маяка, д. 22 к. 2, кв. 187',
+        'actual': True,
+        'type': 'FLAT'
+    },
+    {
+        'cadnum': '77:05:0007007:5142',
+        'full_name': 'Российская Федерация, г. Москва, вн.тер.г. муниципальный округ Чертаново Центральное, ул. Красного Маяка, д. 22 к. 1, кв. 187',
+        'actual': True,
+        'type': 'FLAT'
     }
 ]
 OBJECTS_BY_ADDRESS_RESPONSE = json.dumps(OBJECTS_BY_ADDRESS).encode('utf-8')
