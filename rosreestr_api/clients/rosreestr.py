@@ -39,9 +39,6 @@ class AddressWrapper:
 class RosreestrAPIClient:
 
     BASE_URL = 'https://rosreestr.gov.ru/api/online'
-    MACRO_REGIONS_URL = f'{BASE_URL}/macro_regions/'
-    REGIONS_URL = f'{BASE_URL}/regions/' + '{}/'
-    REGION_TYPES_URL = f'{BASE_URL}/region_types/' + '{}/'
     SEARCH_OBJECTS_BY_ADDRESS_URL = 'https://lk.rosreestr.ru/account-back/address/search'
     SEARCH_OBJECTS_BY_RIGHT_URL = f'{BASE_URL}/right/' + '{}/{}/'
 
@@ -51,8 +48,6 @@ class RosreestrAPIClient:
             keep_alive=keep_alive,
             default_headers={'User-Agent': UserAgent().random}
         )
-        self._macro_regions = None
-        self._macro_regions_to_regions = None
 
     def _get_response_body(self, response: requests.Response):
         status_code = response.status_code
@@ -63,29 +58,6 @@ class RosreestrAPIClient:
             return ''
         else:
             return response.json()
-
-    @property
-    def macro_regions(self):
-        if not self._macro_regions:
-            self._macro_regions = self._http_client.get(self.MACRO_REGIONS_URL).json()
-            logger.info('Macro regions were downloaded')
-        return self._macro_regions
-
-    @property
-    def macro_regions_to_regions(self):
-        if not self._macro_regions_to_regions:
-            self._macro_regions_to_regions = {}
-            for macro_region in self.macro_regions:
-                response = self._http_client.get(
-                    self.REGIONS_URL.format(macro_region['id']))
-                self._macro_regions_to_regions[
-                    macro_region['id']] = response.json()
-            logger.info('Regions were downloaded')
-        return self._macro_regions_to_regions
-
-    def get_region_types(self, region_id: str):
-        response = self._http_client.get(self.REGION_TYPES_URL.format(region_id))
-        return self._get_response_body(response)
 
     def get_objects_by_right(self, region_number: str, right_number: str):
         url = self.SEARCH_OBJECTS_BY_RIGHT_URL.format(region_number, quote_plus(right_number))
