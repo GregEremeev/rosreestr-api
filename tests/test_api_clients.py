@@ -38,11 +38,7 @@ class TestRosreestrAPIClient:
     REGIONS_URL = f'{BASE_URL}/regions/' + '{}/'
     REGION_TYPES_URL = f'{BASE_URL}/region_types/' + '{}/'
     SEARCH_OBJECTS_BY_RIGHT_URL = f'{BASE_URL}/right/' + '{}/{}/'
-    SEARCH_OBJECTS_BY_ADDRESS_URL = (
-        f'{BASE_URL}/address/fir_objects/'
-        + '?macroRegionId={macro_region_id}&regionId={region_id}'
-        + '&street={street_name}&house={house_number}&building={house_building}'
-        + '&structure={house_structure}&apartment={apartment}')
+    SEARCH_OBJECTS_BY_ADDRESS_URL = 'https://lk.rosreestr.ru/account-back/address/search'
     SEARCH_DETAILED_OBJECT_BY_ID = f'{BASE_URL}/fir_object/' + '{}/'
 
     CONTENT_TYPE_JSON = 'application/json'
@@ -103,27 +99,27 @@ class TestRosreestrAPIClient:
 
     @httpretty.activate
     def test_get_objects_by_address(self):
-        macro_region_id = '145000000000'
-        region_id = '145296000000'
-        street_name = 'Красного маяка'
-        house_number = '22'
-        house_building = '2'
-        apartment = '187'
-        address = AddressWrapper(
-            macro_region_id=macro_region_id, region_id=region_id, apartment=apartment,
-            street_name=street_name, house_number=house_number, house_building=house_building)
-        url = self.SEARCH_OBJECTS_BY_ADDRESS_URL.format(
-            macro_region_id=macro_region_id, region_id=region_id,
-            street_name=street_name, house_number=house_number, house_building=house_building,
-            apartment=apartment, house_structure='')
+        address = 'Москва, ул Красного Маяка, д 22, к 2, кв 187'
         httpretty.register_uri(
-            method=httpretty.GET, uri=url, body=rosreestr_client_fixtures.OBJECTS_BY_ADDRESS_RESPONSE,
+            method=httpretty.GET, uri=self.SEARCH_OBJECTS_BY_ADDRESS_URL,
+            body=rosreestr_client_fixtures.OBJECTS_BY_ADDRESS_RESPONSE,
             content_type=self.CONTENT_TYPE_JSON)
 
         api_client = RosreestrAPIClient()
         objects = api_client.get_objects_by_address(address)
 
         assert rosreestr_client_fixtures.OBJECTS_BY_ADDRESS == objects
+        assert {'term': [address]} == httpretty.last_request().querystring
+
+    @httpretty.activate
+    def test_get_objects_by_address_not_found(self):
+        httpretty.register_uri(
+            method=httpretty.GET, uri=self.SEARCH_OBJECTS_BY_ADDRESS_URL, body=b'[]',
+            content_type=self.CONTENT_TYPE_JSON)
+
+        api_client = RosreestrAPIClient()
+
+        assert [] == api_client.get_objects_by_address('Казань, Ибрагимова 53б, кв 1')
 
     @httpretty.activate
     def test_get_object(self):

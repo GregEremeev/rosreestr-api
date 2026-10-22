@@ -42,15 +42,9 @@ class RosreestrAPIClient:
     MACRO_REGIONS_URL = f'{BASE_URL}/macro_regions/'
     REGIONS_URL = f'{BASE_URL}/regions/' + '{}/'
     REGION_TYPES_URL = f'{BASE_URL}/region_types/' + '{}/'
+    SEARCH_OBJECTS_BY_ADDRESS_URL = 'https://lk.rosreestr.ru/account-back/address/search'
     SEARCH_OBJECTS_BY_RIGHT_URL = f'{BASE_URL}/right/' + '{}/{}/'
-    SEARCH_OBJECTS_BY_ADDRESS_URL = (
-        f'{BASE_URL}/address/fir_objects/'
-        + '?macroRegionId={macro_region_id}&regionId={region_id}'
-        + '&street={street_name}&house={house_number}&building={house_building}'
-        + '&structure={house_structure}&apartment={apartment}')
     SEARCH_DETAILED_OBJECT_BY_ID = f'{BASE_URL}/fir_object/' + '{}/'
-
-    REPUBLIC = 'республика'
 
     def __init__(self, timeout=5, keep_alive=False):
         self._http_client = RosreestrHTTPClient(
@@ -70,24 +64,6 @@ class RosreestrAPIClient:
             return ''
         else:
             return response.json()
-
-    def _get_macro_region_id(self, macro_region_name: str):
-        for macro_region in self.macro_regions:
-            if macro_region['name'].lower() == macro_region_name.lower():
-                return macro_region['id']
-        raise ValueError(
-            f'There was not found suitable macro region '
-            f'for macro region name - `{macro_region_name}`')
-
-    def _get_region_id(self, region_name: str, macro_region_name: str) -> int:
-        macro_region_id = self._get_macro_region_id(macro_region_name)
-        for region in self.macro_regions_to_regions[macro_region_id]:
-            if region['name'].lower() == region_name.lower():
-                return region['id']
-        raise ValueError(
-            f'There was not found suitable region_id for '
-            f'region name - `{region_name}` and macro region '
-            f'name - `{macro_region_name}`')
 
     @property
     def macro_regions(self):
@@ -116,34 +92,12 @@ class RosreestrAPIClient:
         url = self.SEARCH_OBJECTS_BY_RIGHT_URL.format(region_number, quote_plus(right_number))
         return self._get_response_body(self._http_client.get(url))
 
-    def get_objects_by_address(self, address_wrapper: AddressWrapper):
-        macro_region_id = address_wrapper.macro_region_id
-        if not address_wrapper.macro_region_id:
-            macro_region_name = address_wrapper.macro_region_name.lower()
-            if macro_region_name.endswith('ая'):
-                macro_region_name = macro_region_name + ' область'
-            elif macro_region_name.endswith('ий'):
-                macro_region_name = macro_region_name + ' край'
-            elif address_wrapper.macro_region_type.lower() == self.REPUBLIC:
-                macro_region_name = f'{self.REPUBLIC} {macro_region_name}'
-            macro_region_id = self._get_macro_region_id(macro_region_name)
-
-        region_id = address_wrapper.region_id
-        if not region_id:
-            region_id = self._get_region_id(
-                address_wrapper.region_name, address_wrapper.macro_region_name)
-
-        search_objects_url = self.SEARCH_OBJECTS_BY_ADDRESS_URL.format(
-            macro_region_id=macro_region_id, region_id=region_id,
-            street_name=address_wrapper.street_name,
-            house_number=address_wrapper.house_number,
-            house_building=address_wrapper.house_building,
-            house_structure=address_wrapper.house_structure,
-            apartment=address_wrapper.apartment)
-
-        logger.info(f'search_objects_url: {search_objects_url}')
-        logger.info('Trying to download rosreestr objects')
-        response = self._http_client.get(search_objects_url)
+    def get_objects_by_address(self, address: str):
+        # rosreestr.gov.ru/api/online was replaced by lk.rosreestr.ru, whose
+        # address search is free text, e.g. 'Москва, ул Красного Маяка, д 22, к 2, кв 187'.
+        # It returns at most 100 objects and includes near matches.
+        logger.info(f'Trying to download rosreestr objects, address: {address}')
+        response = self._http_client.get(self.SEARCH_OBJECTS_BY_ADDRESS_URL, params={'term': address})
 
         objects = self._get_response_body(response)
         if objects:

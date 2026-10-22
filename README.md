@@ -11,27 +11,13 @@ pip install rosreestr-api
 
 2 Different ways how to get basic info about realty objects:
 ```python
-from rosreestr_api.clients.rosreestr import RosreestrAPIClient, AddressWrapper
+from rosreestr_api.clients.rosreestr import RosreestrAPIClient
 
 api_client = RosreestrAPIClient()
 
-# get objects by address
-macro_regions = api_client.macro_regions
-moscow_m_reg_id = [m['id'] for m in macro_regions if m['name'] == 'Москва'][0]
-m_regs_to_regs = api_client.macro_regions_to_regions
-moscow_regions = [m_regs_to_regs[reg_id] for reg_id in m_regs_to_regs if reg_id == moscow_m_reg_id][0]
-region_id = [r['id'] for r in moscow_regions if r['name'] == 'Южный'][0]
-
-address_with_ids = AddressWrapper(
-    macro_region_id=moscow_m_reg_id, region_id=region_id,
-    street_name='Красного маяка', house_number=22, house_building=2,
-    apartment=187)
-address_with_names = AddressWrapper(
-    macro_region_name='Москва', region_name='Южный',
-    street_name='Красного маяка', house_number=22, house_building=2,
-    apartment=187)
-api_client.get_objects_by_address(address_with_ids)
-api_client.get_objects_by_address(address_with_names)
+# get objects by address: returns up to 100 objects with `cadnum`, `full_name`,
+# `actual` and `type` (OKS, PARCEL or FLAT), near matches included
+api_client.get_objects_by_address('Москва, ул Красного Маяка, д 22, к 2, кв 187')
 
 # get object by id (the same as cadastral id for parcel objects, look at `objectId` key)
 api_client.get_object('77:5:7007:4926')
@@ -40,7 +26,7 @@ api_client.get_object('77:5:7007:4926')
 api_client.get_objects_by_right(region_number=177, right_number='50-50-21/042/2012-234')
 
 # get region types by region id
-api_client.get_region_types(region_id=region_id)
+api_client.get_region_types(region_id='145296000000')
 ```
 
 3 Different ways how to get geo info about realty objects:
