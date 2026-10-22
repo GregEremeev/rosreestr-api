@@ -33,55 +33,12 @@ def test_fill_address_wrapper():
 class TestRosreestrAPIClient:
 
     BASE_URL = 'https://rosreestr.gov.ru/api/online'
-    MACRO_REGIONS_URL = f'{BASE_URL}/macro_regions/'
-    REGIONS_URL = f'{BASE_URL}/regions/' + '{}/'
-    REGION_TYPES_URL = f'{BASE_URL}/region_types/' + '{}/'
     SEARCH_OBJECTS_BY_RIGHT_URL = f'{BASE_URL}/right/' + '{}/{}/'
     SEARCH_OBJECTS_BY_ADDRESS_URL = 'https://lk.rosreestr.ru/account-back/address/search'
     NSPD_SEARCH_URL = 'https://nspd.gov.ru/api/geoportal/v2/search/geoportal'
     NSPD_REFERER = 'https://nspd.gov.ru/map?thematic=PKK'
 
     CONTENT_TYPE_JSON = 'application/json'
-
-    @httpretty.activate
-    def test_get_macro_regions(self):
-        httpretty.register_uri(
-            method=httpretty.GET, uri=self.MACRO_REGIONS_URL, body=rosreestr_client_fixtures.MACRO_REGIONS_RESPONSE,
-            content_type=self.CONTENT_TYPE_JSON)
-
-        api_client = RosreestrAPIClient()
-
-        assert rosreestr_client_fixtures.MACRO_REGIONS == api_client.macro_regions
-
-    @httpretty.activate
-    def test_get_regions(self):
-        httpretty.register_uri(
-            method=httpretty.GET, uri=self.MACRO_REGIONS_URL, body=rosreestr_client_fixtures.MACRO_REGIONS_RESPONSE,
-            content_type=self.CONTENT_TYPE_JSON)
-        httpretty.register_uri(
-            method=httpretty.GET, uri=self.REGIONS_URL.format(
-                rosreestr_client_fixtures.MACRO_REGION_ID_1),
-            body=rosreestr_client_fixtures.MACRO_REGION_TO_REGION_1_RESPONSE, content_type=self.CONTENT_TYPE_JSON)
-        httpretty.register_uri(
-            method=httpretty.GET, uri=self.REGIONS_URL.format(
-                rosreestr_client_fixtures.MACRO_REGION_ID_2),
-            body=rosreestr_client_fixtures.MACRO_REGION_TO_REGION_2_RESPONSE, content_type=self.CONTENT_TYPE_JSON)
-
-        api_client = RosreestrAPIClient()
-
-        assert rosreestr_client_fixtures.MACRO_REGIONS_TO_REGIONS == api_client.macro_regions_to_regions
-
-    @httpretty.activate
-    def test_get_region_types(self):
-        httpretty.register_uri(
-            method=httpretty.GET, uri=self.REGION_TYPES_URL.format(
-                rosreestr_client_fixtures.REGION_ID),
-            body=rosreestr_client_fixtures.REGION_TYPES_RESPONSE, content_type=self.CONTENT_TYPE_JSON)
-
-        api_client = RosreestrAPIClient()
-
-        assert rosreestr_client_fixtures.REGION_TYPES == api_client.get_region_types(
-            rosreestr_client_fixtures.REGION_ID)
 
     @httpretty.activate
     def test_get_objects_by_right(self):

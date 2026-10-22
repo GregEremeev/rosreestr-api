@@ -25,9 +25,6 @@ api_client.get_object('77:05:0007007:4926')
 
 # get objects by region number and right number
 api_client.get_objects_by_right(region_number=177, right_number='50-50-21/042/2012-234')
-
-# get region types by region id
-api_client.get_region_types(region_id='145296000000')
 ```
 
 3 Different ways how to get geo info about realty objects:
