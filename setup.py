@@ -1,7 +1,10 @@
 from setuptools import setup, find_packages
 
 
-requirements = [r.strip() for r in open('requirements.txt').readlines() if '#' not in r]
+with open('requirements.txt') as f:
+    # drop comments, including trailing ones, and blank lines
+    requirements = [r.split('#', 1)[0].strip() for r in f]
+requirements = [r for r in requirements if r]
 
 
 setup(
