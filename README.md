@@ -42,3 +42,18 @@ api_client.get_parcel_by_coordinates(lat=55.542, long=37.483)
 # get building by coordinates
 api_client.get_building_by_coordinates(lat=55.828952, long=49.097076)
 ```
+
+4 Errors: both clients raise `requests.HTTPError` for responses with status >= 400.
+For `NSPDAPIClient` it also means "not found": a cadastral id lookup with no match
+raises with status 404, while a coordinates lookup with nothing there returns an empty `features` list:
+```python
+import requests
+
+try:
+    api_client.get_object('77:17:0000000:11471')
+except requests.HTTPError as e:
+    if e.response.status_code == 404:
+        ...  # no object with this cadastral id
+    else:
+        raise
+```

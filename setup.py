@@ -11,7 +11,7 @@ setup(
     name='rosreestr-api',
     author='Greg Eremeev',
     author_email='gregory.eremeev@gmail.com',
-    version='1.0.0',
+    version='2.0.0',
     license='BSD-3-Clause',
     url='https://github.com/GregEremeev/rosreestr-api',
     install_requires=requirements,
