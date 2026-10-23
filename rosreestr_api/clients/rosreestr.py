@@ -107,7 +107,7 @@ class NSPDAPIClient:
             'thematicSearchId': self.NSPD_REAL_ESTATE_THEMATIC_SEARCH_ID,
             'query': cadastral_id,
         }
-        return self._http_client.get(url, params=params).json()
+        return self._get_json(url, params=params)
 
     def _get_feature_info(self, url, layer_id, *, lat, long, limit) -> dict:
         x, y = _wgs84_to_web_mercator(lat=lat, long=long)
@@ -131,7 +131,14 @@ class NSPDAPIClient:
             'I': image_size // 2,
             'J': image_size // 2,
         }
-        return self._http_client.get(url, params=params).json()
+        return self._get_json(url, params=params)
+
+    def _get_json(self, url, params) -> dict:
+        # nspd answers 404 when nothing is found and its WAF answers with
+        # an HTML 403, so check the status before parsing the body
+        response = self._http_client.get(url, params=params)
+        response.raise_for_status()
+        return response.json()
 
 
 def _wgs84_to_web_mercator(*, lat, long):

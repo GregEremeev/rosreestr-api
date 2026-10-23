@@ -2,6 +2,7 @@ import json
 
 import pytest
 import httpretty
+import requests
 
 from tests import nspd_client_fixtures, rosreestr_client_fixtures
 from rosreestr_api.clients.rosreestr import (
@@ -153,4 +154,19 @@ class TestNSPDAPIClient:
 
         api_client = NSPDAPIClient()
 
-        assert not_found == api_client.get_object('77:17:0000000:11471')
+        with pytest.raises(requests.HTTPError) as exc_info:
+            api_client.get_object('77:17:0000000:11471')
+        assert 404 == exc_info.value.response.status_code
+
+    @httpretty.activate
+    def test_get_parcel_by_coordinates_blocked_by_waf(self):
+        httpretty.register_uri(
+            method=httpretty.GET, uri=self.NSPD_PARCELS_WMS_URL, status=403,
+            body='<html><body>Request blocked. Rule: 123</body></html>',
+            content_type='text/html')
+
+        api_client = NSPDAPIClient()
+
+        with pytest.raises(requests.HTTPError) as exc_info:
+            api_client.get_parcel_by_coordinates(lat=55.761, long=37.6096)
+        assert 403 == exc_info.value.response.status_code
