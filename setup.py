@@ -6,6 +6,9 @@ with open('requirements.txt') as f:
     requirements = [r.split('#', 1)[0].strip() for r in f]
 requirements = [r for r in requirements if r]
 
+with open('README.md', encoding='utf-8') as f:
+    long_description = f.read()
+
 
 setup(
     name='rosreestr-api',
@@ -16,7 +19,9 @@ setup(
     url='https://github.com/GregEremeev/rosreestr-api',
     install_requires=requirements,
     description='Toolset to work with lk.rosreestr.ru and nspd.gov.ru',
-    packages=find_packages(),
+    long_description=long_description,
+    long_description_content_type='text/markdown',
+    packages=find_packages(exclude=['tests', 'tests.*']),
     python_requires='>=3.8',
     extras_require={'dev': ['ipdb>=0.13.2', 'pytest>=5.4.1', 'httpretty>=1.0.2']},
     classifiers=[
