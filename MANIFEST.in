@@ -1,4 +1,4 @@
 include README.md
-include LICENSE.txt
+include LICENCE.txt
 include requirements.txt
 include rosreestr_api/cacert.pem
