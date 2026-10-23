@@ -14,11 +14,11 @@ setup(
     install_requires=requirements,
     description='Toolset to work with lk.rosreestr.ru and nspd.gov.ru',
     packages=find_packages(),
+    python_requires='>=3.8',
     extras_require={'dev': ['ipdb>=0.13.2', 'pytest>=5.4.1', 'httpretty>=1.0.2']},
     classifiers=[
         'Intended Audience :: Developers',
         'License :: OSI Approved :: BSD License',
-        'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: 3.9',
         'Programming Language :: Python :: 3.10',
